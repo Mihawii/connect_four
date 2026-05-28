@@ -19,7 +19,7 @@ export function Nav() {
   if (pathname === "/") return null;
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-[var(--board-bg)]/95 backdrop-blur-sm">
+    <header className="sticky top-0 z-40 bg-[var(--board-bg)]">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link href="/" className="group flex items-center gap-2">
           <span className="font-display text-lg font-extrabold text-foreground">
@@ -55,7 +55,7 @@ export function Nav() {
       </div>
 
       {/* Mobile bottom nav */}
-      <nav className="flex items-center justify-around border-t border-border bg-[var(--board-bg)] px-2 py-1.5 md:hidden">
+      <nav className="flex items-center justify-around bg-[var(--board-bg)] px-2 py-1.5 md:hidden">
         {links.map((l) => {
           const active = pathname === l.href || pathname.startsWith(`${l.href}/`);
           const Icon = l.icon;

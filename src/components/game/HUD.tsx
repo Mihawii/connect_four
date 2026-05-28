@@ -36,17 +36,17 @@ function Segmented<T extends string>({
   onChange: (v: T) => void;
 }) {
   return (
-    <div className="inline-flex items-center overflow-hidden rounded-md border border-border bg-[var(--paper)]">
+    <div className="inline-flex items-center gap-1">
       {options.map((o, i) => (
         <button
           key={o.value}
           onClick={() => onChange(o.value)}
           className={cn(
-            "flex items-center gap-1.5 px-3.5 py-1.5 font-display text-xs font-semibold transition-colors",
-            i > 0 && "border-l border-border",
+            "flex items-center gap-1.5 rounded-md px-3 py-1.5 font-display text-xs font-semibold transition-colors",
+            i > 0 && "ml-0.5",
             value === o.value
-              ? "bg-[var(--ink)] text-[var(--paper)]"
-              : "text-muted-foreground hover:bg-[var(--accent)] hover:text-foreground",
+              ? "bg-[var(--board-bg-elevated)] text-foreground"
+              : "text-muted-foreground hover:text-foreground",
           )}
         >
           {o.icon}
@@ -57,7 +57,7 @@ function Segmented<T extends string>({
   );
 }
 
-const selectCls = "h-8 border border-border bg-[var(--paper)] font-display text-xs text-foreground";
+const selectCls = "h-8 border-0 bg-transparent px-2 font-display text-xs text-foreground shadow-none";
 
 export function HUD() {
   const game = useGame((s) => s.game);
@@ -83,7 +83,7 @@ export function HUD() {
     newGame(mode, { opponent, clockPreset: mode === "blitzInferno" ? "60+1" : undefined });
 
   return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2.5 border-b border-border pb-3">
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2.5 pb-3">
       <Segmented options={MODES} value={game.mode} onChange={handleMode} />
 
       <Segmented
@@ -111,7 +111,7 @@ export function HUD() {
           </Select>
           <button
             onClick={() => setOpponent({ kind: "bot", difficulty: botDifficulty, plays: botPlays === 1 ? 2 : 1 })}
-            className="flex items-center gap-1.5 rounded-md border border-border bg-[var(--paper)] px-3 py-1.5 font-display text-xs font-semibold text-foreground transition-colors hover:bg-[var(--accent)]"
+            className="flex items-center gap-1.5 rounded-md px-3 py-1.5 font-display text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground"
           >
             <span className={cn("size-3 rounded-full", botPlays === 1 ? "bg-[var(--ember)]" : "bg-[var(--gold)]")} />
             {PLAYER_LABEL[botPlays]}

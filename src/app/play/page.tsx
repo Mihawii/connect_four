@@ -28,13 +28,13 @@ export default function PlayPage() {
       <div className="relative z-10 mx-auto max-w-6xl px-4 pt-6 sm:px-6">
         <div className="mb-4 flex items-center justify-between">
           <h1 className="font-display text-2xl font-extrabold">Play</h1>
-          <Button asChild variant="outline" size="sm">
+          <Button asChild variant="ghost" size="sm" className="hover:bg-[var(--board-bg-elevated)]">
             <Link href="/room">
               <Users className="size-4" /> Play a friend
             </Link>
           </Button>
         </div>
-        <div className="rounded-lg border-[1.5px] border-ink bg-[var(--paper-2)] p-3 shadow-hard-sm">
+        <div>
           <HUD />
           <div className="mt-4">
             <ClockBar />
@@ -42,7 +42,7 @@ export default function PlayPage() {
         </div>
       </div>
 
-      <div className="relative mx-auto mt-4 h-[64vh] min-h-[440px] w-full max-w-6xl overflow-hidden rounded-lg border-[1.5px] border-ink/40 bg-[var(--board-bg-muted)] shadow-hard">
+      <div className="relative mx-auto mt-4 h-[64vh] min-h-[440px] w-full max-w-6xl overflow-hidden rounded-lg">
         <GameCanvas />
         <WinOverlay />
         <div className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 text-[10px] font-medium text-[var(--paper)] opacity-40">
