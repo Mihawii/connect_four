@@ -1,67 +1,79 @@
 # Inferno
 
-Inferno is Connect Four rebuilt around decay, pressure, and timing.
-In classic Connect Four, pieces are permanent. In Inferno, every disc you place has a lifespan: after ten of your own turns, it burns out and the column collapses.
+Inferno - это игра «Четыре в ряд», переосмысленная вокруг механик распада, давления и времени.
+В классической версии фишки остаются на доске навсегда. В Inferno у каждого поставленного вами диска есть срок жизни: спустя десять ваших ходов он сгорает, и колонка обрушается.
 
-That single rules change is the point of the project.
-It turns a solved board game into a shifting tactical arena where plans expire, positions re-open, and "safe" structures can disappear under you.
+Это единственное изменение в правилах и есть главная суть проекта.
+Оно превращает давно просчитанную настольную игру в изменчивую тактическую арену, где планы устаревают, позиции открываются заново, а «безопасные» структуры могут исчезнуть прямо у вас из-под носа.
 
-## What This Project Represents
+Что представляет собой этот проект
+Inferno начиналась как дизайнерский и системный эксперимент:
 
-Inferno started as a design and systems experiment:
+Сохранить базовую понятность «Четыре в ряд».
 
-- Keep the core readability of Connect Four.
-- Introduce volatility without randomness.
-- Make every mode feel playable in short sessions.
-- Build a game state that is still explainable by an AI coach.
+Внедрить изменчивость без добавления случайности.
 
-This is not a skin over Connect Four.
-It is a different rhythm: less memorization, more adaptation.
+Сделать так, чтобы в каждый режим можно было играть короткими сессиями.
 
-## Unique Features
+Создать такое состояние игры, которое всё ещё можно было бы объяснить ИИ-тренеру.
 
-- **Disc decay system:** your discs burn after ten of your turns, forcing tempo-aware play.
-- **Three formats:** `Classic`, `Inferno`, and `Inferno Blitz` (decay + clock).
-- **3D board presentation:** physically readable columns and collapse moments.
-- **Daily puzzle flow:** one tactical prompt per day with shareable result output.
-- **Lesson track:** focused tactical drills (win scan, block priority, fork creation, support logic).
-- **Room play:** quick friend lobbies via code and QR.
-- **Leaderboard and progression hooks:** format-specific competition surface.
-- **AI post-game coach:** structured game review and key-move feedback.
-- **Cosmetics + Pro path:** optional monetization layer integrated with Stripe.
+Это не просто новый скин для «Четыре в ряд».
+Это совершенно другой ритм: меньше заучивания, больше адаптации.
 
-## Stack
+Уникальные особенности
+Система распада дисков: ваши диски сгорают после десяти ваших ходов, заставляя следить за темпом игры.
 
-- Next.js 15 (App Router)
-- React 19
-- Three.js + React Three Fiber
-- Supabase
-- Prisma
-- Stripe
-- Zod
-- Zustand
+Три формата: Classic, Inferno и Inferno Blitz (распад + таймер).
 
-## Local Development
+3D-визуализация доски: физически понятные колонки и моменты обрушения фишек.
 
-```bash
+Ежедневные головоломки: одна тактическая задача в день с возможностью поделиться результатами.
+
+Обучающий трек: сфокусированные тактические тренировки (поиск победы, приоритет блокировки, создание вилок, логика поддержки).
+
+Игра в комнатах: быстрые лобби для игры с друзьями по коду и QR.
+
+Таблица лидеров и прогрессия: соревновательная среда, адаптированная под каждый формат.
+
+ИИ-тренер после игры: структурированный разбор партии и обратная связь по ключевым ходам.
+
+Косметика + статус Pro: опциональный слой монетизации, интегрированный со Stripe.
+
+Стек технологий
+Next.js 15 (App Router)
+
+React 19
+
+Three.js + React Three Fiber
+
+Supabase
+
+Prisma
+
+Stripe
+
+Zod
+
+Zustand
+
+Локальная разработка
+Bash
 npm install
 cp .env.example .env.local
 npm run dev
-```
+Используйте URL, который выдаст сервер разработки.
 
-Use the URL printed by the dev server.
+Без внешних ключей локальный геймплей всё равно будет работать.
+Авторизация, облачный мультиплеер, бэкенд для ИИ-тренера и платежи активируются при добавлении соответствующих переменных окружения.
 
-Without external keys, local gameplay still works.
-Auth, cloud multiplayer, coach backends, and payments activate when the related environment variables are present.
+Примечания к сборке (Vercel + Prisma)
+Этот репозиторий запускает генерацию Prisma во время сборки:
 
-## Build Notes (Vercel + Prisma)
+postinstall: prisma generate
 
-This repo runs Prisma generation during build:
+build: prisma generate && next build
 
-- `postinstall`: `prisma generate`
-- `build`: `prisma generate && next build`
-
-That prevents stale Prisma client issues in cached CI environments.
+Это предотвращает проблемы с устаревшим клиентом Prisma в кэшированных средах CI.
 
 ## Status
 
