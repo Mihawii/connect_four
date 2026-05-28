@@ -19,13 +19,13 @@ function PlayerCard({ player, now, align }: { player: Player; now: number; align
     const remaining = Math.max(0, base - elapsed);
     const urgent = remaining < 10_000;
     time = (
-      <span className={cn("font-mono text-3xl font-bold tabular-nums leading-none", urgent ? "text-[var(--ember)]" : active ? "text-white" : "text-white/30")}>
+      <span className={cn("font-display text-3xl font-semibold tabular-nums leading-none", urgent ? "text-[var(--ember)]" : active ? "text-foreground" : "text-muted-foreground")}>
         {remaining < 10_000 ? formatClockTenths(remaining) : formatClock(remaining)}
       </span>
     );
   } else {
     time = (
-      <span className={cn("text-sm leading-none", active ? "text-white/80" : "text-white/30")}>
+      <span className={cn("font-display text-sm font-semibold leading-none", active ? "text-foreground" : "text-muted-foreground")}>
         {active ? "to move" : "waiting"}
       </span>
     );
@@ -48,7 +48,7 @@ function PlayerCard({ player, now, align }: { player: Player; now: number; align
     <div className={cn("flex items-center gap-3", align === "right" && "flex-row-reverse text-right")}>
       {disc}
       <div className="flex flex-col gap-0.5">
-        <span className={cn("text-[11px] font-semibold tracking-wide", active ? "text-white/60" : "text-white/25")}>
+        <span className={cn("font-display text-[11px] font-semibold", active ? "text-foreground" : "text-muted-foreground")}>
           {PLAYER_LABEL[player]}
         </span>
         {time}
@@ -89,7 +89,7 @@ export function ClockBar() {
   return (
     <div className="flex items-center justify-between gap-4 px-1">
       <PlayerCard player={1} now={now} align="left" />
-      <span className="text-xs font-medium text-white/30">{status}</span>
+      <span className="font-display text-xs font-semibold text-muted-foreground">{status}</span>
       <PlayerCard player={2} now={now} align="right" />
     </div>
   );

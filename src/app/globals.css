@@ -3,36 +3,40 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* ── Light: warm editorial paper (default) ───────────────────────────────── */
+/* ── App: same warm coal field as the 3D board scene ─────────────────────── */
 :root {
-  --paper: oklch(0.964 0.013 83);
-  --paper-2: oklch(0.94 0.016 80);
-  --ink: oklch(0.205 0.018 55);
-  --ink-soft: oklch(0.46 0.02 62);
-  --line: oklch(0.205 0.018 55);
-  --line-soft: oklch(0.86 0.014 80);
+  --paper: #2f271f;
+  --paper-2: #3a3229;
+  --ink: oklch(0.955 0.01 85);
+  --ink-soft: oklch(0.72 0.018 75);
+  --line: oklch(0.955 0.01 85);
+  --line-soft: oklch(0.42 0.022 62);
   --ember: oklch(0.605 0.214 32);
   --ember-strong: oklch(0.54 0.215 30);
   --gold: oklch(0.83 0.158 86);
-  --coal: oklch(0.235 0.016 58);
+  --coal: #2f271f;
+  --board-bg: #2f271f;
+  --board-bg-elevated: #3a3229;
+  --board-bg-muted: #241e19;
+  --shadow-ink: #16120e;
 
   --background: var(--paper);
   --foreground: var(--ink);
-  --card: var(--paper);
+  --card: var(--paper-2);
   --card-foreground: var(--ink);
   --popover: var(--paper-2);
   --popover-foreground: var(--ink);
   --primary: var(--ember);
   --primary-foreground: oklch(0.98 0.014 85);
-  --secondary: var(--paper-2);
+  --secondary: var(--board-bg-muted);
   --secondary-foreground: var(--ink);
-  --muted: var(--paper-2);
+  --muted: var(--board-bg-muted);
   --muted-foreground: var(--ink-soft);
-  --accent: oklch(0.9 0.035 72);
+  --accent: oklch(0.38 0.03 55);
   --accent-foreground: var(--ink);
   --destructive: oklch(0.55 0.2 28);
-  --border: oklch(0.83 0.014 78);
-  --input: oklch(0.8 0.014 78);
+  --border: oklch(0.42 0.022 62);
+  --input: oklch(0.38 0.02 60);
   --ring: var(--ember);
   --radius: 0.5rem;
 
@@ -55,7 +59,10 @@
   --ember: oklch(0.66 0.221 35);
   --ember-strong: oklch(0.6 0.22 33);
   --gold: oklch(0.84 0.16 88);
-  --coal: oklch(0.145 0.01 60);
+  --coal: #16120e;
+  --board-bg: #16120e;
+  --board-bg-elevated: #2f271f;
+  --board-bg-muted: #0f0d0b;
 
   --background: var(--paper);
   --foreground: var(--ink);
@@ -120,7 +127,7 @@
 
   --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
-  --font-display: var(--font-bricolage), var(--font-space), system-ui, sans-serif;
+  --font-display: var(--font-bricolage), system-ui, sans-serif;
   /* montserrat removed */
 }
 
@@ -131,7 +138,7 @@
     border-color: var(--border);
   }
   html {
-    color-scheme: light dark;
+    color-scheme: dark;
   }
   body {
     background: var(--background);
@@ -146,7 +153,7 @@
   }
   h1, h2, h3, h4 {
     font-family: var(--font-display);
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
   }
 }
 
@@ -156,10 +163,10 @@
   .font-display { font-family: var(--font-display); }
 
   /* riso "sticker" hard offset shadow — replaces all soft glows/gradients */
-  .shadow-hard { box-shadow: 4px 4px 0 0 var(--ink); }
-  .shadow-hard-sm { box-shadow: 2px 2px 0 0 var(--ink); }
+  .shadow-hard { box-shadow: 4px 4px 0 0 var(--shadow-ink); }
+  .shadow-hard-sm { box-shadow: 2px 2px 0 0 var(--shadow-ink); }
   .shadow-hard-ember { box-shadow: 4px 4px 0 0 var(--ember); }
-  .shadow-hard-lg { box-shadow: 6px 6px 0 0 var(--ink); }
+  .shadow-hard-lg { box-shadow: 6px 6px 0 0 var(--shadow-ink); }
 
   .border-ink { border-color: var(--ink); }
 

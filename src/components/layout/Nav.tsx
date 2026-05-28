@@ -18,25 +18,11 @@ export function Nav() {
   const pathname = usePathname();
   if (pathname === "/") return null;
 
-  const isPlay = pathname === "/play" || pathname.startsWith("/play/");
-
   return (
-    <header
-      className={cn(
-        "sticky top-0 z-40",
-        isPlay
-          ? "border-b border-white/[0.06] bg-[#1a1714]"
-          : "border-b-[1.5px] border-ink bg-[var(--paper)]",
-      )}
-    >
+    <header className="sticky top-0 z-40 border-b border-border bg-[var(--board-bg)]/95 backdrop-blur-sm">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link href="/" className="group flex items-center gap-2">
-          <span
-            className={cn(
-              "font-display text-lg font-extrabold tracking-tight",
-              isPlay ? "text-white" : "text-foreground",
-            )}
-          >
+          <span className="font-display text-lg font-extrabold text-foreground">
             Inferno
           </span>
         </Link>
@@ -50,13 +36,7 @@ export function Nav() {
                 href={l.href}
                 className={cn(
                   "relative py-1 text-sm font-medium transition-colors",
-                  isPlay
-                    ? active
-                      ? "text-white"
-                      : "text-white/40 hover:text-white/70"
-                    : active
-                      ? "text-foreground"
-                      : "text-muted-foreground hover:text-foreground",
+                  active ? "text-foreground" : "text-muted-foreground hover:text-foreground",
                 )}
               >
                 {l.label}
@@ -66,23 +46,16 @@ export function Nav() {
           })}
         </nav>
 
-        {!isPlay && (
+        {pathname !== "/play" && (
           <Button asChild variant="ember" size="sm" className="hidden sm:inline-flex">
             <Link href="/play">Play now</Link>
           </Button>
         )}
-        {isPlay && <div className="hidden sm:block" />}
+        {pathname === "/play" && <div className="hidden sm:block" />}
       </div>
 
       {/* Mobile bottom nav */}
-      <nav
-        className={cn(
-          "flex items-center justify-around border-t-[1.5px] px-2 py-1.5 md:hidden",
-          isPlay
-            ? "border-white/[0.06] bg-[#1a1714]"
-            : "border-ink bg-[var(--paper)]",
-        )}
-      >
+      <nav className="flex items-center justify-around border-t border-border bg-[var(--board-bg)] px-2 py-1.5 md:hidden">
         {links.map((l) => {
           const active = pathname === l.href || pathname.startsWith(`${l.href}/`);
           const Icon = l.icon;
@@ -92,13 +65,7 @@ export function Nav() {
               href={l.href}
               className={cn(
                 "flex flex-1 flex-col items-center gap-0.5 rounded-md py-1 text-[10px] font-medium",
-                isPlay
-                  ? active
-                    ? "text-white"
-                    : "text-white/35"
-                  : active
-                    ? "text-foreground"
-                    : "text-muted-foreground",
+                active ? "text-foreground" : "text-muted-foreground",
               )}
             >
               <Icon className={cn("size-5", active && "text-[var(--ember)]")} />

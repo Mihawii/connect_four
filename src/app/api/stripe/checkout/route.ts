@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import type Stripe from "stripe";
 import { getStripe } from "@/lib/stripe/server";
 import { PRO_PLANS, SKINS } from "@/lib/stripe/catalog";
 
@@ -10,13 +11,38 @@ const schema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("skin"), sku: z.string() }),
 ]);
 
+function buildPlanLineItem(plan: (typeof PRO_PLANS)[number]): Stripe.Checkout.SessionCreateParams.LineItem {
+  const priceId = process.env[plan.envPriceKey];
+  if (priceId) return { price: priceId, quantity: 1 };
+
+  const recurring =
+    plan.id === "lifetime"
+      ? undefined
+      : {
+          interval: plan.id === "yearly" ? ("year" as const) : ("month" as const),
+        };
+
+  return {
+    quantity: 1,
+    price_data: {
+      currency: "usd",
+      unit_amount: plan.priceCents,
+      product_data: {
+        name: `Inferno ${plan.name}`,
+        description: plan.perks.slice(0, 3).join(" · "),
+      },
+      ...(recurring ? { recurring } : {}),
+    },
+  };
+}
+
 export async function POST(req: Request) {
   const stripe = getStripe();
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
   if (!stripe) {
     return NextResponse.json(
-      { error: "Stripe not configured. Set STRIPE_SECRET_KEY to enable checkout." },
+      { error: "Stripe not configured. Set STRIPE_SECRET_KEY or STRIPE_RESTRICTED_KEY to enable checkout." },
       { status: 503 },
     );
   }
@@ -31,16 +57,9 @@ export async function POST(req: Request) {
   try {
     if (body.kind === "subscription") {
       const plan = PRO_PLANS.find((p) => p.id === body.plan)!;
-      const priceId = process.env[plan.envPriceKey];
-      if (!priceId) {
-        return NextResponse.json(
-          { error: `Missing ${plan.envPriceKey}. Create the price in Stripe and add it to .env.local.` },
-          { status: 503 },
-        );
-      }
       const session = await stripe.checkout.sessions.create({
         mode: plan.id === "lifetime" ? "payment" : "subscription",
-        line_items: [{ price: priceId, quantity: 1 }],
+        line_items: [buildPlanLineItem(plan)],
         success_url: `${appUrl}/account?upgraded=1`,
         cancel_url: `${appUrl}/store`,
         metadata: { kind: "subscription", plan: plan.id },

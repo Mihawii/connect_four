@@ -26,7 +26,6 @@ export interface Lesson {
   explainBefore: string;
   explainAfter: string;
   checks: string[];
-  tryThis: string;
 }
 
 export const LESSONS: Lesson[] = [
@@ -41,7 +40,6 @@ export const LESSONS: Lesson[] = [
     explainBefore: "You are Ember. Three discs already touch on the bottom row. One column ends the game right now.",
     explainAfter: "Column 4 completes the row. Winning threats outrank every other idea because the game is scored at placement.",
     checks: ["Scan your longest line first.", "Count empty landing squares beside it.", "If four appears now, play it."],
-    tryThis: "Name the row before you click: columns 1, 2, 3, then the missing column.",
   },
   {
     id: "block",
@@ -54,7 +52,6 @@ export const LESSONS: Lesson[] = [
     explainBefore: "Flare has three on the floor. If you spend this move attacking elsewhere, Flare wins on the next move.",
     explainAfter: "Column 4 occupies the only winning square. Your turn checklist is: my win, their win, then my plan.",
     checks: ["Look for the opponent's open threes.", "Find the exact landing square that completes four.", "Block only the square that actually wins."],
-    tryThis: "Say the opponent's winning column out loud, then take it away.",
   },
   {
     id: "center",
@@ -67,7 +64,6 @@ export const LESSONS: Lesson[] = [
     explainBefore: "On an empty board, the middle column gives one disc access to horizontal, vertical, and diagonal plans.",
     explainAfter: "Column 4 is the center. It creates the most future lines and makes your next threats harder to ignore.",
     checks: ["Count how many directions a move influences.", "Prefer central columns when no tactic exists.", "Avoid edge moves unless they solve a concrete threat."],
-    tryThis: "Imagine the disc as an anchor. Choose the spot with the most roads out.",
   },
   {
     id: "vertical",
@@ -80,7 +76,6 @@ export const LESSONS: Lesson[] = [
     explainBefore: "Ember owns three discs in one column. The next disc falls directly on top of them.",
     explainAfter: "Column 3 makes a vertical four. Vertical threats are easy to miss because they do not stretch across the board.",
     checks: ["Read each column from bottom to top.", "Find stacks of three with an empty cell above.", "Make sure the column is not full."],
-    tryThis: "Trace the column upward, not sideways.",
   },
   {
     id: "fork",
@@ -95,7 +90,6 @@ export const LESSONS: Lesson[] = [
     explainAfter:
       "Column 4 creates Ember on columns 2, 3, and 4. Columns 1 and 5 both become threats, and Flare can only block one.",
     checks: ["Build open threes, not closed threes.", "Check both ends of the line.", "Ask whether one defender can cover every threat."],
-    tryThis: "After your move, point to the two different winning columns.",
   },
   {
     id: "diagonal-support",
@@ -108,7 +102,6 @@ export const LESSONS: Lesson[] = [
     explainBefore: "Ember has a rising diagonal. The missing square is high in column 4, so the lower cells must support it first.",
     explainAfter: "Column 4 lands on the support stack and completes the diagonal. Gravity decides which tactics are real.",
     checks: ["Locate the missing diagonal square.", "Count the filled cells below it.", "If the landing row matches the target, the tactic is live."],
-    tryThis: "Read the diagonal, then read the support column before clicking.",
   },
 ];
 

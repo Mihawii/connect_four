@@ -175,7 +175,7 @@ export function RoomClient({ code, mode }: { code: string; mode: Mode }) {
           )}
         </div>
 
-        <div className="flex w-full items-center justify-between rounded-lg border border-border bg-card/60 px-4 py-2">
+        <div className="flex w-full items-center justify-between rounded-lg border border-border bg-[var(--paper-2)] px-4 py-2">
           <Clock state={state} player={1} />
           <div className="text-center text-xs text-muted-foreground">
             {state.status === "playing" ? (
@@ -216,10 +216,10 @@ export function RoomClient({ code, mode }: { code: string; mode: Mode }) {
       </div>
 
       <aside className="space-y-4">
-        <div className="rounded-xl border border-border bg-card/80 p-4">
+        <div className="rounded-lg border border-border bg-[var(--paper-2)] p-4">
           <p className="mb-2 text-xs uppercase tracking-widest text-muted-foreground">Invite a friend</p>
-          <div className="flex justify-center rounded-lg bg-white p-3">
-            {shareUrl && <QRCodeSVG value={shareUrl} size={140} />}
+          <div className="flex justify-center rounded-lg border border-border bg-[var(--paper)] p-3">
+            {shareUrl && <QRCodeSVG value={shareUrl} size={140} bgColor="#f4eee3" fgColor="#2f271f" />}
           </div>
           <div className="mt-3 flex items-center gap-2">
             <code className="flex-1 truncate rounded-md bg-secondary px-2 py-1.5 text-xs">{code}</code>
@@ -229,7 +229,7 @@ export function RoomClient({ code, mode }: { code: string; mode: Mode }) {
           </div>
           <p className="mt-2 text-[11px] text-muted-foreground">Share the link or QR. First two in the room play; the rest spectate.</p>
         </div>
-        <div className="rounded-xl border border-[var(--ember)]/30 bg-[var(--ember)]/5 p-4 text-xs text-muted-foreground">
+        <div className="rounded-lg border border-[var(--ember)]/30 bg-[var(--ember)]/5 p-4 text-xs text-muted-foreground">
           <p className="flex items-center gap-1.5 font-medium text-[var(--ember)]"><Flame className="size-3.5" /> {mode === "blitzInferno" ? "Inferno Blitz" : mode === "inferno" ? "Inferno" : "Classic"}</p>
           <p className="mt-1">{mode === "classic" ? "No decay." : "Discs burn after 10 of your turns."}</p>
         </div>
@@ -243,7 +243,7 @@ function Clock({ state, player }: { state: GameState; player: Player }) {
     return (
       <div className="text-center">
         <p className="text-[10px] uppercase text-muted-foreground">{PLAYER_LABEL[player]}</p>
-        <p className="font-mono text-sm">{state.currentPlayer === player ? "•" : ""}</p>
+        <p className="font-display text-sm font-semibold">{state.currentPlayer === player ? "•" : ""}</p>
       </div>
     );
   }
@@ -251,7 +251,7 @@ function Clock({ state, player }: { state: GameState; player: Player }) {
   return (
     <div className="text-center">
       <p className="text-[10px] uppercase text-muted-foreground">{PLAYER_LABEL[player]}</p>
-      <p className={`font-mono text-lg font-bold tabular-nums ${ms < 10_000 ? "text-red-400" : ""}`}>{formatClock(ms)}</p>
+      <p className={`font-display text-lg font-semibold tabular-nums ${ms < 10_000 ? "text-red-400" : ""}`}>{formatClock(ms)}</p>
     </div>
   );
 }

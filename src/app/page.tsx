@@ -253,7 +253,7 @@ export default function HomePage() {
         }
         .hero-sub {
           margin-top: 1.8rem;
-          font-family: var(--font-space);
+          font-family: var(--font-body);
           font-size: clamp(0.95rem, 1.2vw, 1.1rem);
           line-height: 1.65;
           color: var(--ink-soft);

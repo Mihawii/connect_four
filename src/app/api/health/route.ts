@@ -16,6 +16,8 @@ export async function GET(req: Request) {
       checks: {
         api: { ok: true, status: 200 },
         database: { ok: true, status: 200 },
+        stripe: { ok: Boolean(process.env.STRIPE_SECRET_KEY ?? process.env.STRIPE_RESTRICTED_KEY) },
+        openai: { ok: Boolean(process.env.OPENAI_API_KEY) },
       },
       timestamp: new Date().toISOString(),
     });

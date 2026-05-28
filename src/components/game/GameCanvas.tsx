@@ -14,7 +14,7 @@ export function GameCanvas() {
         gl={{ antialias: true, alpha: true }}
         style={{ background: "transparent" }}
       >
-        <fog attach="fog" args={["#1a1714", 20, 36]} />
+        <fog attach="fog" args={["#2f271f", 20, 36]} />
         <Scene />
       </Canvas>
     </div>

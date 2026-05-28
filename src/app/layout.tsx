@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans, Geist_Mono, Bricolage_Grotesque } from "next/font/google";
 import { Providers } from "./providers";
 import { Nav } from "@/components/layout/Nav";
+import { PageTransition } from "@/components/layout/PageTransition";
 import "./globals.css";
 
 const plusJakarta = Plus_Jakarta_Sans({ variable: "--font-body", subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f4eee3",
+  themeColor: "#2f271f",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -31,7 +32,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers>
           <div className="flex min-h-svh flex-col">
             <Nav />
-            <main className="flex-1">{children}</main>
+            <main className="flex-1">
+              <PageTransition>{children}</PageTransition>
+            </main>
           </div>
         </Providers>
       </body>

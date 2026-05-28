@@ -2,6 +2,7 @@ export interface ProPlan {
   id: "monthly" | "yearly" | "lifetime";
   name: string;
   price: string;
+  priceCents: number;
   cadence: string;
   envPriceKey: string;
   highlight?: boolean;
@@ -13,6 +14,7 @@ export const PRO_PLANS: ProPlan[] = [
     id: "monthly",
     name: "Pro Monthly",
     price: "$3.99",
+    priceCents: 399,
     cadence: "/month",
     envPriceKey: "STRIPE_PRICE_PRO_MONTHLY",
     perks: ["Unlimited ranked", "Unlimited AI coach", "Full puzzle archive", "Advanced stats", "20% off skins"],
@@ -21,6 +23,7 @@ export const PRO_PLANS: ProPlan[] = [
     id: "yearly",
     name: "Pro Yearly",
     price: "$34",
+    priceCents: 3400,
     cadence: "/year",
     envPriceKey: "STRIPE_PRICE_PRO_YEARLY",
     highlight: true,
@@ -30,6 +33,7 @@ export const PRO_PLANS: ProPlan[] = [
     id: "lifetime",
     name: "Pro Lifetime",
     price: "$69",
+    priceCents: 6900,
     cadence: "once",
     envPriceKey: "STRIPE_PRICE_PRO_LIFETIME",
     perks: ["Pay once, Pro forever", "Founder badge", "First 1,000 users only"],

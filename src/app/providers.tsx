@@ -5,6 +5,7 @@ import { ThemeProvider } from "next-themes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { IconoirProvider } from "iconoir-react";
 import { Toaster } from "sonner";
+import { BoardTheme } from "@/components/layout/BoardTheme";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [client] = React.useState(
@@ -15,6 +16,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   );
   return (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+      <BoardTheme />
       <IconoirProvider iconProps={{ strokeWidth: 2, width: "1em", height: "1em" }}>
         <QueryClientProvider client={client}>{children}</QueryClientProvider>
         <Toaster
@@ -26,7 +28,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
               border: "1.5px solid var(--ink)",
               borderRadius: "0.5rem",
               boxShadow: "4px 4px 0 0 var(--ink)",
-              fontFamily: "var(--font-space)",
+              fontFamily: "var(--font-body)",
             },
           }}
         />

@@ -36,17 +36,17 @@ function Segmented<T extends string>({
   onChange: (v: T) => void;
 }) {
   return (
-    <div className="inline-flex items-center overflow-hidden rounded-md border border-white/[0.12]">
+    <div className="inline-flex items-center overflow-hidden rounded-md border border-border bg-[var(--paper)]">
       {options.map((o, i) => (
         <button
           key={o.value}
           onClick={() => onChange(o.value)}
           className={cn(
-            "flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold transition-colors",
-            i > 0 && "border-l border-white/[0.12]",
+            "flex items-center gap-1.5 px-3.5 py-1.5 font-display text-xs font-semibold transition-colors",
+            i > 0 && "border-l border-border",
             value === o.value
-              ? "bg-white/[0.12] text-white"
-              : "text-white/40 hover:bg-white/[0.06] hover:text-white/70",
+              ? "bg-[var(--ink)] text-[var(--paper)]"
+              : "text-muted-foreground hover:bg-[var(--accent)] hover:text-foreground",
           )}
         >
           {o.icon}
@@ -57,7 +57,7 @@ function Segmented<T extends string>({
   );
 }
 
-const selectCls = "h-8 border border-white/[0.12] bg-transparent text-xs text-white/80";
+const selectCls = "h-8 border border-border bg-[var(--paper)] font-display text-xs text-foreground";
 
 export function HUD() {
   const game = useGame((s) => s.game);
@@ -83,7 +83,7 @@ export function HUD() {
     newGame(mode, { opponent, clockPreset: mode === "blitzInferno" ? "60+1" : undefined });
 
   return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2.5 border-b border-white/[0.08] pb-3">
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2.5 border-b border-border pb-3">
       <Segmented options={MODES} value={game.mode} onChange={handleMode} />
 
       <Segmented
@@ -111,7 +111,7 @@ export function HUD() {
           </Select>
           <button
             onClick={() => setOpponent({ kind: "bot", difficulty: botDifficulty, plays: botPlays === 1 ? 2 : 1 })}
-            className="flex items-center gap-1.5 rounded-md border border-white/[0.12] px-3 py-1.5 text-xs font-medium text-white/80 transition-colors hover:bg-white/[0.06]"
+            className="flex items-center gap-1.5 rounded-md border border-border bg-[var(--paper)] px-3 py-1.5 font-display text-xs font-semibold text-foreground transition-colors hover:bg-[var(--accent)]"
           >
             <span className={cn("size-3 rounded-full", botPlays === 1 ? "bg-[var(--ember)]" : "bg-[var(--gold)]")} />
             {PLAYER_LABEL[botPlays]}
@@ -141,14 +141,14 @@ export function HUD() {
 
       <div className="ml-auto flex items-center gap-1">
         {showHints && (
-          <Button variant="ghost" size="icon" onClick={handleHint} disabled={game.status !== "playing"} title="Hint" className="text-white/40 hover:bg-white/[0.08] hover:text-white/70">
+          <Button variant="ghost" size="icon" onClick={handleHint} disabled={game.status !== "playing"} title="Hint" className="text-muted-foreground">
             <Sparkles className="text-[var(--ember)]" />
           </Button>
         )}
-        <Button variant="ghost" size="icon" onClick={undo} disabled={game.moves.length === 0} title="Undo" className="text-white/40 hover:bg-white/[0.08] hover:text-white/70">
+        <Button variant="ghost" size="icon" onClick={undo} disabled={game.moves.length === 0} title="Undo" className="text-muted-foreground">
           <Undo2 />
         </Button>
-        <Button variant="ghost" size="icon" onClick={reset} title="Restart" className="text-white/40 hover:bg-white/[0.08] hover:text-white/70">
+        <Button variant="ghost" size="icon" onClick={reset} title="Restart" className="text-muted-foreground">
           <RotateCcw />
         </Button>
       </div>

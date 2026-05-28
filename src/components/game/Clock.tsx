@@ -33,7 +33,7 @@ export function Clock({ player }: { player: Player }) {
         )}
       >
         <div className="text-muted-foreground">{PLAYER_LABEL[player]}</div>
-        <div className="font-mono text-base text-foreground">{game.currentPlayer === player ? "Your turn" : "Wait"}</div>
+        <div className="font-display text-base font-semibold text-foreground">{game.currentPlayer === player ? "Your turn" : "Wait"}</div>
       </div>
     );
   }
@@ -62,7 +62,7 @@ export function Clock({ player }: { player: Player }) {
       <div className="text-muted-foreground">{PLAYER_LABEL[player]}</div>
       <div
         className={cn(
-          "font-mono text-2xl font-bold tabular-nums",
+          "font-display text-2xl font-semibold tabular-nums",
           urgent ? "text-red-400" : "text-foreground",
         )}
       >

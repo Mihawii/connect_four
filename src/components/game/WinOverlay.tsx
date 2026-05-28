@@ -44,7 +44,7 @@ export function WinOverlay() {
               <Sparkles className="size-6 text-[oklch(0.99_0.014_85)]" />
             </span>
             <h2 className="mt-4 font-display text-3xl font-extrabold">{headline}</h2>
-            <p className="mt-1 font-mono text-xs uppercase tracking-wider text-muted-foreground">
+            <p className="mt-1 font-display text-xs font-semibold uppercase text-muted-foreground">
               {game.totalTurns} moves · {burned} burned
             </p>
             <div className="mt-5 flex flex-col gap-2">

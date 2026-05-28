@@ -82,7 +82,7 @@ export default function LearnPage() {
             }`}
             aria-label={l.title}
           >
-            <span className="block font-mono text-[10px]">{i + 1}</span>
+            <span className="block font-display text-[10px] font-semibold">{i + 1}</span>
             <span className="block truncate font-medium">{l.concept}</span>
           </button>
         ))}
@@ -92,7 +92,7 @@ export default function LearnPage() {
         <Card className="p-5 sm:p-6">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <Badge variant="muted">{lesson.concept}</Badge>
-            <span className="font-mono text-xs text-muted-foreground">
+            <span className="font-display text-xs font-semibold text-muted-foreground">
               Lesson {idx + 1} of {LESSONS.length}
             </span>
           </div>
@@ -134,25 +134,19 @@ export default function LearnPage() {
             )}
           </div>
         </Card>
-
-        <aside className="space-y-4">
+        <aside>
           <div className="rounded-lg border border-border bg-card p-4">
             <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Decision checklist</p>
             <ol className="mt-3 space-y-2 text-sm leading-relaxed">
               {lesson.checks.map((check, i) => (
                 <li key={check} className="flex gap-2">
-                  <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-[var(--ember)]/12 font-mono text-[10px] text-[var(--ember)]">
+                  <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-[var(--ember)]/12 font-display text-[10px] font-semibold text-[var(--ember)]">
                     {i + 1}
                   </span>
                   <span>{check}</span>
                 </li>
               ))}
             </ol>
-          </div>
-
-          <div className="rounded-lg border border-ink bg-[var(--gold)]/35 p-4 shadow-hard-sm">
-            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Try this</p>
-            <p className="mt-2 text-sm leading-relaxed">{lesson.tryThis}</p>
           </div>
         </aside>
       </div>

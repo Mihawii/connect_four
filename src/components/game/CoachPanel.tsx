@@ -71,7 +71,7 @@ export function CoachPanel() {
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl bg-white/[0.03] p-5"
+      className="rounded-lg border-[1.5px] border-ink bg-[var(--paper-2)] p-5 shadow-hard-sm"
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
@@ -80,12 +80,12 @@ export function CoachPanel() {
           </div>
           <div>
             <h3 className="font-display text-lg font-semibold leading-tight">AI Coach</h3>
-            {source && <p className="font-mono text-[10px] text-muted-foreground">{source}</p>}
+            {source && <p className="font-display text-[10px] font-semibold text-muted-foreground">{source}</p>}
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Select value={persona} onValueChange={setPersona}>
-            <SelectTrigger className="h-8 w-40 text-xs">
+              <Select value={persona} onValueChange={setPersona}>
+            <SelectTrigger className="h-8 w-40 font-display text-xs">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -109,8 +109,8 @@ export function CoachPanel() {
 
           <div className="grid grid-cols-3 gap-2">
             {(["opening", "midgame", "endgame"] as const).map((ph) => (
-              <div key={ph} className="rounded-lg bg-white/[0.04] p-3 text-center">
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{ph}</p>
+              <div key={ph} className="rounded-lg border border-border bg-[var(--paper)] p-3 text-center">
+                <p className="font-display text-[10px] font-semibold uppercase text-muted-foreground">{ph}</p>
                 <p className="font-display text-2xl font-bold text-[var(--ember)]">{review.phaseGrades[ph]}</p>
               </div>
             ))}
@@ -143,8 +143,8 @@ export function CoachPanel() {
                 <TrendingUp className="size-3" /> Key moves
               </p>
               {review.moves.map((m) => (
-                <div key={m.turn} className="flex items-baseline gap-2 rounded-md bg-white/[0.04] px-3 py-1.5 text-xs">
-                  <span className="font-mono text-muted-foreground">#{m.turn}</span>
+                <div key={m.turn} className="flex items-baseline gap-2 rounded-md border border-border bg-[var(--paper)] px-3 py-1.5 text-xs">
+                  <span className="font-display font-semibold text-muted-foreground">#{m.turn}</span>
                   <Badge variant="outline" className={cn("border-current", CLASS_COLOR[m.classification])}>
                     {m.classification}
                   </Badge>

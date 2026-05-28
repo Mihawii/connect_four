@@ -1,20 +1,59 @@
 "use client";
 
 import * as React from "react";
-import { Trophy, MapPin, Globe, Users, Flame, Swords, Clock } from "@/components/icons";
+import {
+  Bonfire,
+  Globe,
+  Medal1st,
+  NavArrowRight,
+  PeopleTag,
+  Pin,
+  Timer,
+  Tournament,
+  Trophy,
+} from "iconoir-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
 import { demoLeaderboard, type LeaderRow } from "@/lib/leaderboardDemo";
 import { LEADERBOARD_FORMATS } from "@/lib/leaderboard";
-import { isSupabaseEnabled } from "@/lib/supabase/config";
 import { cn } from "@/lib/utils";
 
 const FORMATS = LEADERBOARD_FORMATS;
 
+const SCOPES = [
+  { label: "Global", icon: Globe, active: true },
+  { label: "Almaty", icon: Pin, active: false },
+  { label: "Friends", icon: PeopleTag, active: false },
+];
+
+const TOURNAMENTS = [
+  { title: "Weekly Blitz Open", kind: "Free", seats: "32 players", prize: "Cosmetic ribbon for top 3", when: "Sun 18:00" },
+  { title: "Pro Cup", kind: "Pro", seats: "16 players", prize: "Champion flair + XP boost", when: "Sun 20:00" },
+];
+
+function RankMark({ rank }: { rank: number }) {
+  if (rank === 1) {
+    return (
+      <span className="flex size-9 items-center justify-center rounded-md border-[1.5px] border-ink bg-[var(--gold)] text-ink shadow-hard-sm">
+        <Medal1st className="size-5" strokeWidth={2} />
+      </span>
+    );
+  }
+
+  return (
+    <span
+      className={cn(
+        "flex size-9 items-center justify-center rounded-md border border-border bg-[var(--paper)] font-display text-base font-semibold",
+        rank <= 3 && "border-ink bg-[var(--ember)]/10",
+      )}
+    >
+      {rank}
+    </span>
+  );
+}
+
 export default function LeaderboardPage() {
   const [format, setFormat] = React.useState("blitzInferno");
   const [rows, setRows] = React.useState<LeaderRow[]>(() => demoLeaderboard(1));
-  const [source, setSource] = React.useState("demo");
 
   React.useEffect(() => {
     let active = true;
@@ -26,11 +65,9 @@ export default function LeaderboardPage() {
         const data = await res.json();
         if (!active) return;
         setRows(data.rows);
-        setSource(data.source ?? "api");
       } catch {
         if (!active) return;
         setRows(demoLeaderboard(FORMATS.findIndex((f) => f.value === format) + 1));
-        setSource("demo");
       }
     }
 
@@ -41,112 +78,138 @@ export default function LeaderboardPage() {
     };
   }, [format]);
 
+  const leader = rows[0];
+
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-4 border-b-[1.5px] border-ink pb-5">
-        <div className="flex items-center gap-3">
-        <div className="flex size-11 items-center justify-center rounded-xl bg-[var(--ember)]/15 text-[var(--ember)]">
-          <Trophy className="size-6" />
-        </div>
-        <div>
-          <h1 className="font-display text-3xl font-bold">The Ladder</h1>
-          <p className="mt-1 max-w-lg text-sm leading-relaxed text-muted-foreground">
-            Ratings by format. Watch the top table, then take a room code to a friend.
-          </p>
-        </div>
-        </div>
-        <div className="rounded-lg border border-border bg-[var(--paper-2)] px-3 py-2 text-right">
-          <p className="font-mono text-xl font-bold tabular-nums">{rows[0]?.rating ?? "—"}</p>
-          <p className="text-[10px] uppercase tracking-widest text-muted-foreground">rating to chase</p>
-        </div>
-      </div>
-
-      {(!isSupabaseEnabled || source === "demo") && (
-        <div className="mb-4 flex items-center gap-2 rounded-lg border border-yellow-500/30 bg-yellow-500/5 px-4 py-2 text-xs text-yellow-300">
-          <Flame className="size-3.5" /> Showing API-backed demo data. Connect player ratings to populate the real ladder.
-        </div>
-      )}
-
-      <Tabs value={format} onValueChange={setFormat}>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <TabsList>
-            {FORMATS.map((f) => (
-              <TabsTrigger key={f.value} value={f.value}>
-                {f.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-          <div className="flex gap-1 text-xs text-muted-foreground">
-            <button className="flex items-center gap-1 rounded-md bg-secondary px-2 py-1"><Globe className="size-3" /> Global</button>
-            <button className="flex items-center gap-1 rounded-md px-2 py-1 hover:bg-accent"><MapPin className="size-3" /> Almaty</button>
-            <button className="flex items-center gap-1 rounded-md px-2 py-1 hover:bg-accent"><Users className="size-3" /> Friends</button>
+    <main className="mx-auto max-w-6xl px-4 py-10">
+      <header className="grid gap-5 border-b-[1.5px] border-ink pb-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="flex items-start gap-3">
+          <div className="flex size-12 shrink-0 items-center justify-center rounded-lg border-[1.5px] border-ink bg-[var(--ember)] text-[oklch(0.99_0.014_85)] shadow-hard-sm">
+            <Trophy className="size-6" strokeWidth={2.2} />
+          </div>
+          <div>
+            <h1 className="font-display text-3xl font-semibold leading-tight">The Ladder</h1>
           </div>
         </div>
 
-        {FORMATS.map((f) => (
-          <TabsContent key={f.value} value={f.value}>
-            <div className="overflow-hidden rounded-lg border-[1.5px] border-ink bg-[var(--paper-2)]">
-              {rows.map((r) => (
-                <div
-                  key={r.name}
-                  className={cn(
-                    "grid grid-cols-[3rem_minmax(0,1fr)_auto] items-center gap-3 border-b border-border/70 px-4 py-3 text-sm last:border-0 sm:grid-cols-[3rem_minmax(0,1fr)_6rem_5rem_5rem]",
-                    r.rank <= 3 && "bg-[var(--ember)]/5",
-                  )}
-                >
-                  <span
+        <aside className="rounded-lg border-[1.5px] border-ink bg-[var(--paper-2)] p-4">
+          <p className="font-display text-sm font-semibold text-muted-foreground">Current mark</p>
+          <div className="mt-2 flex items-end justify-between gap-3">
+            <div>
+              <p className="font-display text-4xl font-semibold leading-none">{leader?.rating ?? "—"}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{leader ? `${leader.name}, ${leader.city}` : "No leader yet"}</p>
+            </div>
+            <Bonfire className="size-8 text-[var(--ember)]" strokeWidth={2.2} />
+          </div>
+        </aside>
+      </header>
+
+      <section className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
+        <Tabs value={format} onValueChange={setFormat} className="min-w-0">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <TabsList className="border-[1.5px] border-ink bg-[var(--paper-2)]">
+              {FORMATS.map((f) => (
+                <TabsTrigger key={f.value} value={f.value} className="font-display text-sm font-semibold">
+                  {f.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+
+            <div className="flex rounded-lg border border-border bg-[var(--paper-2)] p-1">
+              {SCOPES.map((scope) => {
+                const Icon = scope.icon;
+                return (
+                  <button
+                    key={scope.label}
+                    type="button"
                     className={cn(
-                      "text-center font-mono text-lg font-bold",
-                      r.rank === 1 ? "text-yellow-400" : r.rank === 2 ? "text-zinc-300" : r.rank === 3 ? "text-orange-400" : "text-muted-foreground",
+                      "flex items-center gap-1.5 rounded-md px-2.5 py-1.5 font-display text-xs font-semibold transition-colors",
+                      scope.active ? "bg-[var(--ink)] text-[var(--paper)]" : "text-muted-foreground hover:bg-[var(--accent)] hover:text-foreground",
                     )}
                   >
-                    {r.rank}
-                  </span>
-                  <div className="flex-1">
-                    <p className="font-medium">{r.name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      <MapPin className="mr-0.5 inline size-3" />
-                      {r.city}, {r.country}
-                    </p>
+                    <Icon className="size-3.5" strokeWidth={2.2} />
+                    {scope.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {FORMATS.map((f) => (
+            <TabsContent key={f.value} value={f.value} className="mt-4">
+              <div className="overflow-hidden rounded-lg border-[1.5px] border-ink bg-[var(--paper-2)]">
+                <div className="hidden grid-cols-[4rem_minmax(0,1fr)_7rem_6rem_6rem] items-center border-b-[1.5px] border-ink bg-[var(--paper)] px-4 py-2 font-display text-xs font-semibold text-muted-foreground sm:grid">
+                  <span>Rank</span>
+                  <span>Player</span>
+                  <span>Tier</span>
+                  <span>Games</span>
+                  <span className="text-right">Rating</span>
+                </div>
+
+                {rows.map((r) => (
+                  <div
+                    key={r.name}
+                    className={cn(
+                      "grid grid-cols-[3rem_minmax(0,1fr)_4.5rem] items-center gap-3 border-b border-border/80 px-4 py-3 last:border-0 sm:grid-cols-[4rem_minmax(0,1fr)_7rem_6rem_6rem]",
+                      r.rank <= 3 && "bg-[var(--gold)]/14",
+                    )}
+                  >
+                    <RankMark rank={r.rank} />
+
+                    <div className="min-w-0">
+                      <p className="truncate font-display text-base font-semibold">{r.name}</p>
+                      <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
+                        <Pin className="size-3" strokeWidth={2.2} />
+                        {r.city}, {r.country}
+                      </p>
+                    </div>
+
+                    <span className="hidden w-fit rounded-md border border-border bg-[var(--paper)] px-2 py-1 font-display text-xs font-semibold text-muted-foreground sm:inline-flex">
+                      {r.tier}
+                    </span>
+                    <span className="hidden font-display text-sm font-semibold text-muted-foreground sm:inline">{r.games}</span>
+                    <span className="text-right font-display text-xl font-semibold text-[var(--ember)]">{r.rating}</span>
                   </div>
-                  <Badge variant="muted" className="hidden sm:inline-flex">
-                    {r.tier}
-                  </Badge>
-                  <span className="hidden text-xs text-muted-foreground sm:inline">{r.games} games</span>
-                  <span className="w-14 text-right font-mono font-bold text-[var(--ember)]">{r.rating}</span>
+                ))}
+              </div>
+            </TabsContent>
+          ))}
+        </Tabs>
+
+        <aside className="space-y-3">
+          <div className="rounded-lg border-[1.5px] border-ink bg-[var(--paper-2)] p-4">
+            <p className="flex items-center gap-2 font-display text-sm font-semibold">
+              <Tournament className="size-4 text-[var(--ember)]" strokeWidth={2.2} />
+              Weekly tables
+            </p>
+            <div className="mt-3 space-y-3">
+              {TOURNAMENTS.map((event) => (
+                <div key={event.title} className="rounded-md border border-border bg-[var(--paper)] p-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <h2 className="font-display text-base font-semibold">{event.title}</h2>
+                      <p className="mt-1 text-xs text-muted-foreground">{event.kind}, {event.seats}</p>
+                    </div>
+                    <NavArrowRight className="mt-0.5 size-4 text-muted-foreground" strokeWidth={2.2} />
+                  </div>
+                  <p className="mt-3 text-sm leading-relaxed">{event.prize}</p>
+                  <p className="mt-3 flex items-center gap-1.5 text-sm text-muted-foreground">
+                    <Timer className="size-4 text-[var(--ember)]" strokeWidth={2.2} />
+                    {event.when}
+                  </p>
                 </div>
               ))}
             </div>
-          </TabsContent>
-        ))}
-      </Tabs>
+          </div>
 
-      <section className="mt-10">
-        <h2 className="mb-3 flex items-center gap-2 font-display text-2xl font-bold">
-          <Swords className="size-5 text-[var(--ember)]" /> Weekly tournaments
-        </h2>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {[
-            { title: "Weekly Blitz Open", kind: "Free · 32 players", prize: "Cosmetic ribbon for top 3", when: "Sun 18:00" },
-            { title: "Pro Cup", kind: "Pro · 16 players", prize: "Champion flair + XP boost", when: "Sun 20:00" },
-          ].map((t) => (
-            <div key={t.title} className="rounded-lg border-[1.5px] border-ink bg-[var(--paper-2)] p-4 transition-transform duration-200 hover:-translate-y-0.5">
-              <div className="flex items-center justify-between">
-                <h3 className="font-display text-lg font-semibold">{t.title}</h3>
-                <Badge variant={t.kind.startsWith("Pro") ? "ember" : "muted"}>{t.kind.split(" · ")[0]}</Badge>
-              </div>
-              <p className="mt-1 text-xs text-muted-foreground">{t.kind}</p>
-              <p className="mt-2 text-sm">{t.prize}</p>
-              <div className="mt-3 flex items-center justify-between">
-                <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Clock className="size-3" /> {t.when}
-                </span>
-                <span className="text-xs font-medium text-[var(--ember)]">Registration opens soon</span>
-              </div>
-            </div>
-          ))}
-        </div>
+          <div className="rounded-lg border border-border bg-[var(--paper-2)] p-4">
+            <p className="font-display text-sm font-semibold">How rating moves</p>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              Beat stronger players to climb faster. Inferno Blitz is weighted separately from Classic.
+            </p>
+          </div>
+        </aside>
       </section>
-    </div>
+    </main>
   );
 }

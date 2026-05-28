@@ -15,7 +15,7 @@ import { OnboardingModal } from "@/components/onboarding/OnboardingModal";
 const GameCanvas = dynamic(() => import("@/components/game/GameCanvas").then((m) => m.GameCanvas), {
   ssr: false,
   loading: () => (
-    <div className="flex h-full w-full items-center justify-center font-mono text-xs uppercase tracking-widest text-[var(--gold)]">
+    <div className="flex h-full w-full items-center justify-center font-display text-xs font-semibold uppercase text-[var(--gold)]">
       Lighting the board…
     </div>
   ),
@@ -23,27 +23,29 @@ const GameCanvas = dynamic(() => import("@/components/game/GameCanvas").then((m)
 
 export default function PlayPage() {
   return (
-    <div className="play-page dark min-h-svh bg-[#1a1714] text-[#f0ece4]">
+    <div className="play-page min-h-svh text-foreground">
       <SoundManager />
-      <div className="relative z-10 mx-auto max-w-6xl px-4 pt-5 sm:px-6">
+      <div className="relative z-10 mx-auto max-w-6xl px-4 pt-6 sm:px-6">
         <div className="mb-4 flex items-center justify-between">
-          <h1 className="font-display text-2xl font-extrabold tracking-tight">Play</h1>
-          <Button asChild variant="ghost" size="sm" className="text-white/50 hover:bg-white/[0.08] hover:text-white/80">
+          <h1 className="font-display text-2xl font-extrabold">Play</h1>
+          <Button asChild variant="outline" size="sm">
             <Link href="/room">
               <Users className="size-4" /> Play a friend
             </Link>
           </Button>
         </div>
-        <HUD />
-        <div className="mt-4">
-          <ClockBar />
+        <div className="rounded-lg border-[1.5px] border-ink bg-[var(--paper-2)] p-3 shadow-hard-sm">
+          <HUD />
+          <div className="mt-4">
+            <ClockBar />
+          </div>
         </div>
       </div>
 
-      <div className="relative mt-2 h-[64vh] min-h-[440px] w-full">
+      <div className="relative mx-auto mt-4 h-[64vh] min-h-[440px] w-full max-w-6xl overflow-hidden rounded-lg border-[1.5px] border-ink/40 bg-[var(--board-bg-muted)] shadow-hard">
         <GameCanvas />
         <WinOverlay />
-        <div className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 text-[10px] font-medium text-white/20">
+        <div className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 text-[10px] font-medium text-[var(--paper)] opacity-40">
           drag to rotate · click a column
         </div>
       </div>

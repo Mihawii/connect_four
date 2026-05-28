@@ -38,8 +38,8 @@ export function MiniBoard({
               onMouseLeave={() => setHover(null)}
               className={cn(
                 "flex flex-col-reverse gap-1.5 rounded-md p-1 transition-colors sm:gap-2",
-                playable && onColClick && "cursor-pointer hover:bg-white/5",
-                hover === c && playable && "bg-white/10",
+                playable && onColClick && "cursor-pointer hover:bg-[#f4eee3]/10",
+                hover === c && playable && "bg-[#f4eee3]/15",
               )}
             >
               {Array.from({ length: ROWS }, (_, r) => {
@@ -51,7 +51,7 @@ export function MiniBoard({
                     className={cn(
                       "relative size-7 rounded-full sm:size-9 md:size-10",
                       !disc && "bg-[#161210] shadow-[inset_0_2px_3px_rgba(0,0,0,0.6)]",
-                      win && "ring-2 ring-white",
+                      win && "ring-2 ring-[var(--paper)]",
                     )}
                     style={
                       disc
@@ -76,7 +76,7 @@ export function MiniBoard({
       {showColNumbers && (
         <div className="mt-1.5 grid grid-cols-7 gap-1.5 sm:gap-2">
           {Array.from({ length: COLS }, (_, c) => (
-            <span key={c} className="text-center font-mono text-[10px] text-white/35">
+            <span key={c} className="text-center font-display text-[10px] font-semibold text-[var(--paper)] opacity-45">
               {c + 1}
             </span>
           ))}

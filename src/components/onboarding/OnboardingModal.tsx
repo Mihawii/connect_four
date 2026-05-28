@@ -81,7 +81,7 @@ export function OnboardingModal() {
         </div>
         
         <div className="p-6 sm:p-8">
-          <div className={`mb-6 inline-flex size-14 items-center justify-center rounded-2xl border-[1.5px] border-ink bg-white shadow-[4px_4px_0_0_var(--ink)] ${curr.color}`}>
+          <div className={`mb-6 inline-flex size-14 items-center justify-center rounded-2xl border-[1.5px] border-ink bg-[var(--paper-2)] shadow-[4px_4px_0_0_var(--ink)] ${curr.color}`}>
             <Icon className="size-7" />
           </div>
           

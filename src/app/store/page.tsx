@@ -19,6 +19,14 @@ const KIND_LABEL: Record<SkinKind, string> = {
 
 export default function StorePage() {
   const [pending, setPending] = React.useState<string | null>(null);
+  const [stripeReady, setStripeReady] = React.useState<boolean | null>(null);
+
+  React.useEffect(() => {
+    fetch("/api/stripe/status", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((d) => setStripeReady(Boolean(d.enabled)))
+      .catch(() => setStripeReady(false));
+  }, []);
 
   const checkout = async (body: Record<string, unknown>, id: string) => {
     setPending(id);
@@ -55,6 +63,11 @@ export default function StorePage() {
           <Flame className="mr-1 size-3" /> No ads. Ever.
         </Badge>
         <h1 className="font-display text-4xl font-bold">Go Pro. Dress the fire.</h1>
+        {stripeReady === false && (
+          <p className="mt-3 text-sm text-muted-foreground">
+            Payments are offline — add Stripe keys to <code className="rounded bg-secondary px-1">.env.local</code> and restart the dev server.
+          </p>
+        )}
       </div>
 
       <SquishyPricing
@@ -82,7 +95,7 @@ export default function StorePage() {
           return (
             <div key={kind} className="grid gap-3 border-b border-border py-5 last:border-b-0 md:grid-cols-[11rem_minmax(0,1fr)]">
               <div>
-                <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">{KIND_LABEL[kind]}</p>
+                <p className="font-display text-xs font-semibold uppercase text-muted-foreground">{KIND_LABEL[kind]}</p>
                 <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
                   {kind === "bundle" ? "Best value sets." : kind === "burnfx" ? "The moment a disc expires." : "Small changes, big table presence."}
                 </p>
@@ -94,14 +107,14 @@ export default function StorePage() {
                       <div className="absolute inset-0 paper-grain opacity-15" />
                       <span className="absolute bottom-3 left-3 size-8 rounded-full border-[1.5px] border-ink bg-[var(--ember)] transition-transform duration-200 group-hover:translate-x-1" />
                       <span className="absolute bottom-3 left-12 size-8 rounded-full border-[1.5px] border-ink bg-[var(--gold)] transition-transform duration-200 group-hover:translate-x-2" />
-                      <span className="absolute right-3 top-3 rounded-md border border-ink bg-[var(--paper)] px-2 py-1 font-mono text-[10px] uppercase">
+                      <span className="absolute right-3 top-3 rounded-md border border-ink bg-[var(--paper)] px-2 py-1 font-display text-[10px] font-semibold uppercase">
                         {skin.kind}
                       </span>
                     </div>
                     <div className="p-4">
                       <div className="flex items-center justify-between">
                         <h4 className="font-medium">{skin.name}</h4>
-                        <span className="font-mono text-sm text-[var(--ember)]">{skinPrice(skin.priceCents)}</span>
+                        <span className="font-display text-sm font-semibold text-[var(--ember)]">{skinPrice(skin.priceCents)}</span>
                       </div>
                       <p className="mt-1 text-xs text-muted-foreground">{skin.description}</p>
                       <Button
