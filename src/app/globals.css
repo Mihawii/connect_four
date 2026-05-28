@@ -1,0 +1,149 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: oklch(0.985 0.005 80);
+  --foreground: oklch(0.18 0.02 40);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.02 40);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.02 40);
+  --primary: oklch(0.65 0.22 35);
+  --primary-foreground: oklch(0.98 0.01 80);
+  --secondary: oklch(0.95 0.01 80);
+  --secondary-foreground: oklch(0.18 0.02 40);
+  --muted: oklch(0.95 0.01 80);
+  --muted-foreground: oklch(0.5 0.02 60);
+  --accent: oklch(0.95 0.05 60);
+  --accent-foreground: oklch(0.2 0.05 40);
+  --destructive: oklch(0.6 0.24 25);
+  --border: oklch(0.92 0.01 80);
+  --input: oklch(0.92 0.01 80);
+  --ring: oklch(0.65 0.22 35);
+  --radius: 0.65rem;
+
+  --ember: oklch(0.7 0.24 40);
+  --ember-bright: oklch(0.82 0.22 55);
+  --ash: oklch(0.55 0.01 60);
+  --wood: oklch(0.45 0.08 50);
+  --p1: oklch(0.7 0.22 40);
+  --p2: oklch(0.85 0.18 90);
+}
+
+.dark {
+  --background: oklch(0.13 0.01 50);
+  --foreground: oklch(0.96 0.01 80);
+  --card: oklch(0.17 0.01 50);
+  --card-foreground: oklch(0.96 0.01 80);
+  --popover: oklch(0.17 0.01 50);
+  --popover-foreground: oklch(0.96 0.01 80);
+  --primary: oklch(0.7 0.24 40);
+  --primary-foreground: oklch(0.1 0.01 50);
+  --secondary: oklch(0.23 0.01 50);
+  --secondary-foreground: oklch(0.96 0.01 80);
+  --muted: oklch(0.23 0.01 50);
+  --muted-foreground: oklch(0.68 0.02 60);
+  --accent: oklch(0.3 0.06 40);
+  --accent-foreground: oklch(0.96 0.01 80);
+  --destructive: oklch(0.65 0.25 25);
+  --border: oklch(0.27 0.01 50);
+  --input: oklch(0.27 0.01 50);
+  --ring: oklch(0.7 0.24 40);
+
+  --ember: oklch(0.72 0.26 40);
+  --ember-bright: oklch(0.86 0.22 60);
+  --ash: oklch(0.5 0.01 60);
+  --wood: oklch(0.35 0.07 45);
+  --p1: oklch(0.7 0.24 40);
+  --p2: oklch(0.86 0.2 92);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ember: var(--ember);
+  --color-ember-bright: var(--ember-bright);
+  --color-ash: var(--ash);
+  --color-wood: var(--wood);
+  --color-p1: var(--p1);
+  --color-p2: var(--p2);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-display: var(--font-display), ui-sans-serif, system-ui;
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    border-color: var(--border);
+  }
+  html {
+    color-scheme: dark light;
+  }
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection {
+    background: color-mix(in oklch, var(--ember) 30%, transparent);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .text-pretty {
+    text-wrap: pretty;
+  }
+  .glow-ember {
+    box-shadow: 0 0 24px color-mix(in oklch, var(--ember) 60%, transparent),
+      0 0 8px color-mix(in oklch, var(--ember-bright) 80%, transparent);
+  }
+  .glow-ring-ember {
+    box-shadow: 0 0 0 2px color-mix(in oklch, var(--ember) 40%, transparent),
+      0 0 20px color-mix(in oklch, var(--ember) 50%, transparent);
+  }
+  .grid-bg {
+    background-image: radial-gradient(circle at 1px 1px, color-mix(in oklch, var(--foreground) 8%, transparent) 1px, transparent 0);
+    background-size: 24px 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
