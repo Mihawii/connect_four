@@ -55,23 +55,23 @@ const DEFAULT_PLANS: SquishyPricingPlan[] = [
 const CARD_STYLES = [
   {
     background: "bg-[var(--ember)]",
-    foreground: "text-[oklch(0.99_0.014_85)]",
-    chip: "border-[var(--paper)]/30 bg-[var(--paper)]/20 text-[var(--paper)]",
-    button: "border-ink bg-[var(--paper)] text-[var(--ink)] hover:bg-[var(--gold)]",
+    foreground: "text-[oklch(0.98_0.012_95)]",
+    chip: "border-white/30 bg-white/15 text-[oklch(0.98_0.012_95)]",
+    button: "border-ink bg-[oklch(0.98_0.012_95)] text-[var(--board-bg)] hover:bg-[var(--gold)]",
     BGComponent: BGComponent1,
   },
   {
     background: "bg-[var(--gold)]",
-    foreground: "text-[var(--ink)]",
-    chip: "border-ink/20 bg-[var(--paper)]/40 text-[var(--ink)]",
+    foreground: "text-[oklch(0.27_0.02_58)]",
+    chip: "border-black/20 bg-white/40 text-[oklch(0.27_0.02_58)]",
     button: "border-ink bg-[var(--ink)] text-[var(--paper)] hover:bg-[var(--ember)] hover:text-[var(--paper)]",
     BGComponent: BGComponent2,
   },
   {
     background: "bg-[var(--board-bg-muted)]",
-    foreground: "text-[var(--paper)]",
-    chip: "border-[var(--paper)]/20 bg-[var(--paper)]/12 text-[var(--paper)]",
-    button: "border-ink bg-[var(--paper)] text-[var(--ink)] hover:bg-[var(--ember)] hover:text-[var(--paper)]",
+    foreground: "text-[oklch(0.98_0.012_95)]",
+    chip: "border-white/25 bg-white/12 text-[oklch(0.98_0.012_95)]",
+    button: "border-ink bg-[oklch(0.98_0.012_95)] text-[var(--board-bg)] hover:bg-[var(--ember)] hover:text-[oklch(0.98_0.012_95)]",
     BGComponent: BGComponent3,
   },
 ];

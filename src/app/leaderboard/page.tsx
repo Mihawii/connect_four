@@ -83,12 +83,12 @@ export default function LeaderboardPage() {
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
       <header className="grid gap-5 border-b-[1.5px] border-ink pb-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <div className="flex items-start gap-3">
-          <div className="flex size-12 shrink-0 items-center justify-center rounded-lg border-[1.5px] border-ink bg-[var(--ember)] text-[oklch(0.99_0.014_85)] shadow-hard-sm">
-            <Trophy className="size-6" strokeWidth={2.2} />
+        <div className="flex items-start gap-4">
+          <div className="flex size-16 shrink-0 items-center justify-center rounded-lg border-[1.5px] border-ink bg-[var(--ember)] text-[oklch(0.99_0.014_85)] shadow-hard-sm">
+            <Trophy className="size-8" strokeWidth={2.2} />
           </div>
           <div>
-            <h1 className="font-display text-3xl font-semibold leading-tight">The Ladder</h1>
+            <h1 className="font-display text-5xl font-semibold leading-tight md:text-6xl">The Ladder</h1>
           </div>
         </div>
 

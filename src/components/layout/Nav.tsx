@@ -1,8 +1,9 @@
 "use client";
 
+import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Flame, Trophy, Sparkles, ShoppingBag, GraduationCap } from "@/components/icons";
+import { Flame, Trophy, Sparkles, ShoppingBag, GraduationCap, Globe } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -16,6 +17,21 @@ const links = [
 
 export function Nav() {
   const pathname = usePathname();
+  const [language, setLanguage] = React.useState<"EN" | "RU" | "KZ">("EN");
+
+  React.useEffect(() => {
+    const saved = window.localStorage.getItem("inferno_language");
+    if (saved === "EN" || saved === "RU" || saved === "KZ") {
+      setLanguage(saved);
+    }
+  }, []);
+
+  const cycleLanguage = () => {
+    const next = language === "EN" ? "RU" : language === "RU" ? "KZ" : "EN";
+    setLanguage(next);
+    window.localStorage.setItem("inferno_language", next);
+  };
+
   if (pathname === "/") return null;
 
   return (
@@ -46,12 +62,23 @@ export function Nav() {
           })}
         </nav>
 
-        {pathname !== "/play" && (
-          <Button asChild variant="ember" size="sm" className="hidden sm:inline-flex">
-            <Link href="/play">Play now</Link>
-          </Button>
-        )}
-        {pathname === "/play" && <div className="hidden sm:block" />}
+        <div className="hidden items-center gap-2 sm:flex">
+          <button
+            type="button"
+            onClick={cycleLanguage}
+            className="inline-flex h-9 items-center gap-1.5 rounded-md px-3 font-display text-xs font-semibold text-muted-foreground transition-colors hover:bg-[var(--board-bg-elevated)] hover:text-foreground"
+            aria-label="Change language"
+            title="Change language"
+          >
+            <Globe className="size-4" />
+            {language}
+          </button>
+          {pathname !== "/play" && (
+            <Button asChild variant="ember" size="sm" className="inline-flex">
+              <Link href="/play">Play now</Link>
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Mobile bottom nav */}
