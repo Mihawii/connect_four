@@ -1,29 +1,22 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, Geist_Mono, Bricolage_Grotesque } from "next/font/google";
 import { Providers } from "./providers";
 import { Nav } from "@/components/layout/Nav";
 import "./globals.css";
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
+const plusJakarta = Plus_Jakarta_Sans({ variable: "--font-body", subsets: ["latin"], weight: ["400", "500", "600", "700", "800"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+const bricolage = Bricolage_Grotesque({ variable: "--font-bricolage", subsets: ["latin"], weight: ["400", "600", "700", "800"] });
 
 export const metadata: Metadata = {
-  title: "Inferno — Blitz Connect Four with a Burning Board",
-  description:
-    "Bullet Connect Four. Every disc burns after ten of your turns. Play vs friends, beat the AI coach, climb the ladder.",
+  title: "Inferno — Blitz Connect Four",
+  description: "Bullet Connect Four. Every disc burns after ten of your turns.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
-  openGraph: {
-    title: "Inferno",
-    description: "Blitz Connect Four with a burning board.",
-    type: "website",
-  },
+  openGraph: { title: "Inferno", description: "Blitz Connect Four with a burning board.", type: "website" },
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fffaf3" },
-    { media: "(prefers-color-scheme: dark)", color: "#0e0f12" },
-  ],
+  themeColor: "#f4eee3",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -32,7 +25,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-svh`}>
+      <body
+        className={`${plusJakarta.variable} ${geistMono.variable} ${bricolage.variable} font-sans antialiased min-h-svh`}
+      >
         <Providers>
           <div className="flex min-h-svh flex-col">
             <Nav />

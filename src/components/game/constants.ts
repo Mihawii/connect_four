@@ -12,14 +12,19 @@ export const DISC_RADIUS = SLOT_SIZE * 0.42;
 export const DISC_THICKNESS = SLOT_SIZE * 0.22;
 
 export const PLAYER_COLOR_HEX: Record<1 | 2, string> = {
-  1: "#FF5722",
-  2: "#F2C94C",
+  1: "#E0531E",
+  2: "#ECB73C",
 };
 
 export const PLAYER_COLOR_HOT: Record<1 | 2, string> = {
-  1: "#FFC1A6",
-  2: "#FFF3CC",
+  1: "#FF8A4C",
+  2: "#FFE08A",
 };
+
+export const PLAYER_COLOR_CHAR = "#1a1410";
+export const BOARD_COLOR = "#2e2924";
+export const SLOT_COLOR = "#161210";
+export const STAGE_COLOR = "#211e1a";
 
 export const PLAYER_LABEL: Record<1 | 2, string> = {
   1: "Ember",

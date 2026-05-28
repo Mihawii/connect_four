@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { motion } from "motion/react";
-import { Sparkles, Loader2, GraduationCap, TrendingUp, AlertTriangle, Star } from "lucide-react";
+import { Sparkles, Loader2, GraduationCap, TrendingUp, AlertTriangle, Star } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -71,7 +71,7 @@ export function CoachPanel() {
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl border border-border bg-card/80 p-5 backdrop-blur"
+      className="rounded-2xl bg-white/[0.03] p-5"
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
@@ -80,9 +80,7 @@ export function CoachPanel() {
           </div>
           <div>
             <h3 className="font-display text-lg font-semibold leading-tight">AI Coach</h3>
-            <p className="text-xs text-muted-foreground">
-              Powered by the solver + Claude. {source && <span className="font-mono">({source})</span>}
-            </p>
+            {source && <p className="font-mono text-[10px] text-muted-foreground">{source}</p>}
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -111,7 +109,7 @@ export function CoachPanel() {
 
           <div className="grid grid-cols-3 gap-2">
             {(["opening", "midgame", "endgame"] as const).map((ph) => (
-              <div key={ph} className="rounded-lg border border-border/60 bg-background/40 p-3 text-center">
+              <div key={ph} className="rounded-lg bg-white/[0.04] p-3 text-center">
                 <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{ph}</p>
                 <p className="font-display text-2xl font-bold text-[var(--ember)]">{review.phaseGrades[ph]}</p>
               </div>
@@ -120,7 +118,7 @@ export function CoachPanel() {
 
           <div className="grid gap-2 sm:grid-cols-2">
             {review.heroMoment && (
-              <div className="flex items-start gap-2 rounded-lg border border-cyan-500/30 bg-cyan-500/5 p-3">
+              <div className="flex items-start gap-2 rounded-lg bg-cyan-500/[0.08] p-3">
                 <Star className="mt-0.5 size-4 shrink-0 text-cyan-400" />
                 <div>
                   <p className="text-xs font-semibold text-cyan-400">Hero moment · move {review.heroMoment.turn}</p>
@@ -129,7 +127,7 @@ export function CoachPanel() {
               </div>
             )}
             {review.turningPoint && (
-              <div className="flex items-start gap-2 rounded-lg border border-red-500/30 bg-red-500/5 p-3">
+              <div className="flex items-start gap-2 rounded-lg bg-red-500/[0.08] p-3">
                 <AlertTriangle className="mt-0.5 size-4 shrink-0 text-red-400" />
                 <div>
                   <p className="text-xs font-semibold text-red-400">Turning point · move {review.turningPoint.turn}</p>
@@ -145,7 +143,7 @@ export function CoachPanel() {
                 <TrendingUp className="size-3" /> Key moves
               </p>
               {review.moves.map((m) => (
-                <div key={m.turn} className="flex items-baseline gap-2 rounded-md bg-background/40 px-3 py-1.5 text-xs">
+                <div key={m.turn} className="flex items-baseline gap-2 rounded-md bg-white/[0.04] px-3 py-1.5 text-xs">
                   <span className="font-mono text-muted-foreground">#{m.turn}</span>
                   <Badge variant="outline" className={cn("border-current", CLASS_COLOR[m.classification])}>
                     {m.classification}

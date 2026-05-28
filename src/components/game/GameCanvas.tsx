@@ -8,13 +8,13 @@ export function GameCanvas() {
   return (
     <div className="relative w-full h-full">
       <Canvas
-        camera={{ position: [0, 0, 11], fov: 38 }}
+        camera={{ position: [0, 0.5, 13], fov: 36 }}
         dpr={[1, 2]}
         shadows
         gl={{ antialias: true, alpha: true }}
+        style={{ background: "transparent" }}
       >
-        <color attach="background" args={["#0a0a0d"]} />
-        <fog attach="fog" args={["#0a0a0d", 14, 24]} />
+        <fog attach="fog" args={["#1a1714", 20, 36]} />
         <Scene />
       </Canvas>
     </div>

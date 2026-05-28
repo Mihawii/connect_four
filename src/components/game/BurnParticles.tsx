@@ -63,7 +63,7 @@ export function BurnParticles({
         <bufferAttribute attach="attributes-position" args={[positionsArr, 3]} />
       </bufferGeometry>
       <pointsMaterial
-        color="#FF5722"
+        color="#FF7A3C"
         size={0.18}
         sizeAttenuation
         transparent

@@ -3,17 +3,16 @@
 import * as React from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { motion } from "motion/react";
-import { Copy, Check, Users, Flame, RotateCcw, Crown, Wifi, WifiOff } from "lucide-react";
+import { Copy, Check, Users, Flame, RotateCcw, Crown, Wifi, WifiOff } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MiniBoard } from "@/components/game/MiniBoard";
-import { getSupabaseBrowser } from "@/lib/supabase/client";
-import { isSupabaseEnabled } from "@/lib/supabase/config";
 import { applyMove, createInitialState, legalMoves, makeClock, tickClock } from "@/lib/engine/rules";
 import { formatClock } from "@/lib/utils";
 import { PLAYER_LABEL } from "@/components/game/constants";
 import type { GameState, Mode, Player } from "@/lib/engine/types";
 import { playSound } from "@/lib/sound";
+import { roomShareUrl } from "@/lib/room/share";
 
 type Role = "connecting" | "host" | "guest" | "spectator";
 
@@ -32,47 +31,68 @@ export function RoomClient({ code, mode }: { code: string; mode: Mode }) {
   const [connected, setConnected] = React.useState(false);
   const [state, setState] = React.useState<GameState>(() => freshState(mode));
   const [copied, setCopied] = React.useState(false);
-  const channelRef = React.useRef<ReturnType<NonNullable<ReturnType<typeof getSupabaseBrowser>>["channel"]> | null>(null);
-
-  const shareUrl = typeof window !== "undefined" ? `${window.location.origin}/room/${code}?mode=${mode}` : "";
+  const isJoiningRef = React.useRef(false);
+  
+  const shareUrl = typeof window !== "undefined" ? roomShareUrl(window.location.origin, code, mode) : "";
 
   React.useEffect(() => {
-    const sb = getSupabaseBrowser();
-    if (!sb) return;
-    const channel = sb.channel(`room-${code}`, {
-      config: { presence: { key: clientId }, broadcast: { self: false } },
-    });
+    let mounted = true;
+    let pollInterval: NodeJS.Timeout;
 
-    channel.on("presence", { event: "sync" }, () => {
-      const presence = channel.presenceState();
-      const ids = Object.keys(presence).sort();
-      setPeerCount(ids.length);
-      const idx = ids.indexOf(clientId);
-      setRole(idx === 0 ? "host" : idx === 1 ? "guest" : "spectator");
-    });
-
-    channel.on("broadcast", { event: "move" }, ({ payload }) => {
-      setState((s) => {
-        const next = applyMove(s, payload.col as number);
-        if (next !== s) playSound("drop", 0.6);
-        return next;
-      });
-    });
-
-    channel.on("broadcast", { event: "reset" }, ({ payload }) => {
-      setState(freshState((payload.mode as Mode) ?? mode));
-    });
-
-    channel.subscribe(async (status) => {
-      if (status === "SUBSCRIBED") {
-        setConnected(true);
-        await channel.track({ clientId, at: Date.now() });
+    const syncRoom = async () => {
+      try {
+        const res = await fetch(`/api/room/${code}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (mounted) {
+            setConnected(true);
+            const serverState = data.state as GameState;
+            
+            // Only update state if it's actually different to avoid interrupting local tick
+            setState((prev) => {
+              if (prev.moves.length !== serverState.moves.length) {
+                if (serverState.moves.length > prev.moves.length) {
+                  playSound("drop", 0.6);
+                }
+                return serverState;
+              }
+              return prev;
+            });
+            
+            const peers = data.peers as string[];
+            setPeerCount(peers.length);
+            const idx = peers.indexOf(clientId);
+            if (idx >= 0) {
+              setRole(idx === 0 ? "host" : idx === 1 ? "guest" : "spectator");
+            }
+          }
+        }
+      } catch {
+        if (mounted) setConnected(false);
       }
-    });
+    };
 
-    channelRef.current = channel;
+    const joinRoom = async () => {
+      if (isJoiningRef.current) return;
+      isJoiningRef.current = true;
+      try {
+        await fetch(`/api/room/${code}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "join", clientId, mode }),
+        });
+        await syncRoom();
+        pollInterval = setInterval(syncRoom, 1000); // 1-second polling
+      } catch (err) {
+        console.error("Failed to join room", err);
+      }
+    };
+
+    joinRoom();
+
     return () => {
-      void sb.removeChannel(channel);
+      mounted = false;
+      clearInterval(pollInterval);
     };
   }, [code, clientId, mode]);
 
@@ -91,19 +111,41 @@ export function RoomClient({ code, mode }: { code: string; mode: Mode }) {
   const myPlayer: Player | null = role === "host" ? 1 : role === "guest" ? 2 : null;
   const myTurn = myPlayer !== null && state.currentPlayer === myPlayer && state.status === "playing" && peerCount >= 2;
 
-  const makeMove = (col: number) => {
+  const makeMove = async (col: number) => {
     if (!myTurn) return;
+    
+    // Optimistic UI update
     const next = applyMove(state, col);
     if (next === state) return;
     setState(next);
     playSound("drop", 0.6);
-    channelRef.current?.send({ type: "broadcast", event: "move", payload: { col } });
+    
+    try {
+      await fetch(`/api/room/${code}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "move", clientId, col }),
+      });
+    } catch (err) {
+      console.error("Failed to submit move", err);
+    }
   };
 
-  const reset = () => {
+  const reset = async () => {
     if (role !== "host") return;
+    
+    // Optimistic update
     setState(freshState(mode));
-    channelRef.current?.send({ type: "broadcast", event: "reset", payload: { mode } });
+    
+    try {
+      await fetch(`/api/room/${code}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "reset", clientId, mode }),
+      });
+    } catch (err) {
+      console.error("Failed to reset room", err);
+    }
   };
 
   const copy = async () => {
@@ -111,24 +153,6 @@ export function RoomClient({ code, mode }: { code: string; mode: Mode }) {
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   };
-
-  if (!isSupabaseEnabled) {
-    return (
-      <div className="mx-auto max-w-md px-4 py-16 text-center">
-        <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-xl bg-[var(--ember)]/15 text-[var(--ember)]">
-          <Users className="size-6" />
-        </div>
-        <h1 className="font-display text-2xl font-bold">Online rooms need Supabase</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Add your Supabase URL and anon key to <code className="rounded bg-secondary px-1">.env.local</code> to play
-          friends over the internet. In the meantime, you can play pass-and-play locally.
-        </p>
-        <Button asChild variant="ember" className="mt-4">
-          <a href="/play">Play local</a>
-        </Button>
-      </div>
-    );
-  }
 
   return (
     <div className="mx-auto grid max-w-5xl gap-5 px-4 py-8 lg:grid-cols-[1fr_300px]">

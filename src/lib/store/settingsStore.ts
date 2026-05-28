@@ -14,6 +14,7 @@ interface SettingsState {
   soundVolume: number;
   showHints: boolean;
   showColumnNumbers: boolean;
+  hasSeenOnboarding: boolean;
   setHighContrast: (v: boolean) => void;
   setDiscPattern: (v: DiscPattern) => void;
   setReducedMotion: (v: boolean) => void;
@@ -21,6 +22,7 @@ interface SettingsState {
   setSoundVolume: (v: number) => void;
   setShowHints: (v: boolean) => void;
   setShowColumnNumbers: (v: boolean) => void;
+  setHasSeenOnboarding: (v: boolean) => void;
 }
 
 export const useSettings = create<SettingsState>()(
@@ -33,6 +35,7 @@ export const useSettings = create<SettingsState>()(
       soundVolume: 0.7,
       showHints: true,
       showColumnNumbers: false,
+      hasSeenOnboarding: false,
       setHighContrast: (v) => set({ highContrast: v }),
       setDiscPattern: (v) => set({ discPattern: v }),
       setReducedMotion: (v) => set({ reducedMotion: v }),
@@ -40,6 +43,7 @@ export const useSettings = create<SettingsState>()(
       setSoundVolume: (v) => set({ soundVolume: v }),
       setShowHints: (v) => set({ showHints: v }),
       setShowColumnNumbers: (v) => set({ showColumnNumbers: v }),
+      setHasSeenOnboarding: (v) => set({ hasSeenOnboarding: v }),
     }),
     { name: "inferno-settings" },
   ),

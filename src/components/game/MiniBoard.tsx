@@ -25,7 +25,7 @@ export function MiniBoard({
   const isWinning = (c: number, r: number) => !!winningLine?.some((p) => p.col === c && p.row === r);
 
   return (
-    <div className="inline-block rounded-2xl bg-gradient-to-b from-[#3a2410] to-[#5a3a1a] p-3 shadow-xl">
+    <div className="inline-block rounded-lg border-[1.5px] border-ink bg-[var(--coal)] p-3 shadow-hard">
       <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
         {Array.from({ length: COLS }, (_, c) => {
           const playable = !disabled && (!legalCols || legalCols.includes(c));
@@ -37,7 +37,7 @@ export function MiniBoard({
               onMouseEnter={() => setHover(c)}
               onMouseLeave={() => setHover(null)}
               className={cn(
-                "flex flex-col-reverse gap-1.5 rounded-lg p-1 transition-colors sm:gap-2",
+                "flex flex-col-reverse gap-1.5 rounded-md p-1 transition-colors sm:gap-2",
                 playable && onColClick && "cursor-pointer hover:bg-white/5",
                 hover === c && playable && "bg-white/10",
               )}
@@ -50,23 +50,21 @@ export function MiniBoard({
                     key={r}
                     className={cn(
                       "relative size-7 rounded-full sm:size-9 md:size-10",
-                      disc ? "shadow-inner" : "bg-[#0d0d10]",
+                      !disc && "bg-[#161210] shadow-[inset_0_2px_3px_rgba(0,0,0,0.6)]",
                       win && "ring-2 ring-white",
                     )}
                     style={
                       disc
                         ? {
-                            background:
-                              disc.player === 1
-                                ? "radial-gradient(circle at 35% 30%, #ff7b3a, #e2451b)"
-                                : "radial-gradient(circle at 35% 30%, #ffe89a, #e8b93a)",
-                            boxShadow: disc.age > 8 ? "0 0 12px #ff5722" : undefined,
+                            background: disc.player === 1 ? "var(--ember)" : "var(--gold)",
+                            boxShadow:
+                              "inset 0 -2px 4px rgba(0,0,0,0.28), inset 0 2px 3px rgba(255,255,255,0.25)",
                           }
                         : undefined
                     }
                   >
-                    {disc && disc.player === 2 && (
-                      <span className="absolute inset-[30%] rounded-full border-2 border-black/20" />
+                    {disc?.player === 2 && (
+                      <span className="absolute inset-[28%] rounded-full border-[2.5px] border-[#1a1410]/70" />
                     )}
                   </span>
                 );
@@ -76,9 +74,9 @@ export function MiniBoard({
         })}
       </div>
       {showColNumbers && (
-        <div className="mt-1 grid grid-cols-7 gap-1.5 sm:gap-2">
+        <div className="mt-1.5 grid grid-cols-7 gap-1.5 sm:gap-2">
           {Array.from({ length: COLS }, (_, c) => (
-            <span key={c} className="text-center font-mono text-[10px] text-white/40">
+            <span key={c} className="text-center font-mono text-[10px] text-white/35">
               {c + 1}
             </span>
           ))}

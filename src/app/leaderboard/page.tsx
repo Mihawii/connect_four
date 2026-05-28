@@ -1,38 +1,69 @@
 "use client";
 
 import * as React from "react";
-import { Trophy, MapPin, Globe, Users, Flame, Swords, Clock } from "lucide-react";
+import { Trophy, MapPin, Globe, Users, Flame, Swords, Clock } from "@/components/icons";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { demoLeaderboard } from "@/lib/leaderboardDemo";
+import { demoLeaderboard, type LeaderRow } from "@/lib/leaderboardDemo";
+import { LEADERBOARD_FORMATS } from "@/lib/leaderboard";
 import { isSupabaseEnabled } from "@/lib/supabase/config";
 import { cn } from "@/lib/utils";
 
-const FORMATS = [
-  { value: "blitzInferno", label: "Inferno Blitz" },
-  { value: "inferno", label: "Inferno" },
-  { value: "classic", label: "Classic" },
-];
+const FORMATS = LEADERBOARD_FORMATS;
 
 export default function LeaderboardPage() {
   const [format, setFormat] = React.useState("blitzInferno");
-  const rows = React.useMemo(() => demoLeaderboard(FORMATS.findIndex((f) => f.value === format) + 1), [format]);
+  const [rows, setRows] = React.useState<LeaderRow[]>(() => demoLeaderboard(1));
+  const [source, setSource] = React.useState("demo");
+
+  React.useEffect(() => {
+    let active = true;
+
+    async function loadLeaderboard() {
+      try {
+        const res = await fetch(`/api/leaderboard?format=${format}`, { cache: "no-store" });
+        if (!res.ok) throw new Error("Leaderboard unavailable");
+        const data = await res.json();
+        if (!active) return;
+        setRows(data.rows);
+        setSource(data.source ?? "api");
+      } catch {
+        if (!active) return;
+        setRows(demoLeaderboard(FORMATS.findIndex((f) => f.value === format) + 1));
+        setSource("demo");
+      }
+    }
+
+    void loadLeaderboard();
+
+    return () => {
+      active = false;
+    };
+  }, [format]);
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10">
-      <div className="mb-6 flex items-center gap-3">
+    <div className="mx-auto max-w-5xl px-4 py-10">
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-4 border-b-[1.5px] border-ink pb-5">
+        <div className="flex items-center gap-3">
         <div className="flex size-11 items-center justify-center rounded-xl bg-[var(--ember)]/15 text-[var(--ember)]">
           <Trophy className="size-6" />
         </div>
         <div>
           <h1 className="font-display text-3xl font-bold">The Ladder</h1>
-          <p className="text-sm text-muted-foreground">ELO by format. Climb from Spark to Inferno.</p>
+          <p className="mt-1 max-w-lg text-sm leading-relaxed text-muted-foreground">
+            Ratings by format. Watch the top table, then take a room code to a friend.
+          </p>
+        </div>
+        </div>
+        <div className="rounded-lg border border-border bg-[var(--paper-2)] px-3 py-2 text-right">
+          <p className="font-mono text-xl font-bold tabular-nums">{rows[0]?.rating ?? "—"}</p>
+          <p className="text-[10px] uppercase tracking-widest text-muted-foreground">rating to chase</p>
         </div>
       </div>
 
-      {!isSupabaseEnabled && (
+      {(!isSupabaseEnabled || source === "demo") && (
         <div className="mb-4 flex items-center gap-2 rounded-lg border border-yellow-500/30 bg-yellow-500/5 px-4 py-2 text-xs text-yellow-300">
-          <Flame className="size-3.5" /> Showing demo data. Connect Supabase to populate the real ladder.
+          <Flame className="size-3.5" /> Showing API-backed demo data. Connect player ratings to populate the real ladder.
         </div>
       )}
 
@@ -54,18 +85,18 @@ export default function LeaderboardPage() {
 
         {FORMATS.map((f) => (
           <TabsContent key={f.value} value={f.value}>
-            <div className="overflow-hidden rounded-xl border border-border">
+            <div className="overflow-hidden rounded-lg border-[1.5px] border-ink bg-[var(--paper-2)]">
               {rows.map((r) => (
                 <div
                   key={r.name}
                   className={cn(
-                    "flex items-center gap-3 border-b border-border/50 px-4 py-3 text-sm last:border-0",
+                    "grid grid-cols-[3rem_minmax(0,1fr)_auto] items-center gap-3 border-b border-border/70 px-4 py-3 text-sm last:border-0 sm:grid-cols-[3rem_minmax(0,1fr)_6rem_5rem_5rem]",
                     r.rank <= 3 && "bg-[var(--ember)]/5",
                   )}
                 >
                   <span
                     className={cn(
-                      "w-6 text-center font-mono font-bold",
+                      "text-center font-mono text-lg font-bold",
                       r.rank === 1 ? "text-yellow-400" : r.rank === 2 ? "text-zinc-300" : r.rank === 3 ? "text-orange-400" : "text-muted-foreground",
                     )}
                   >
@@ -81,7 +112,7 @@ export default function LeaderboardPage() {
                   <Badge variant="muted" className="hidden sm:inline-flex">
                     {r.tier}
                   </Badge>
-                  <span className="text-xs text-muted-foreground">{r.games} games</span>
+                  <span className="hidden text-xs text-muted-foreground sm:inline">{r.games} games</span>
                   <span className="w-14 text-right font-mono font-bold text-[var(--ember)]">{r.rating}</span>
                 </div>
               ))}
@@ -99,7 +130,7 @@ export default function LeaderboardPage() {
             { title: "Weekly Blitz Open", kind: "Free · 32 players", prize: "Cosmetic ribbon for top 3", when: "Sun 18:00" },
             { title: "Pro Cup", kind: "Pro · 16 players", prize: "Champion flair + XP boost", when: "Sun 20:00" },
           ].map((t) => (
-            <div key={t.title} className="rounded-xl border border-border bg-card/70 p-4">
+            <div key={t.title} className="rounded-lg border-[1.5px] border-ink bg-[var(--paper-2)] p-4 transition-transform duration-200 hover:-translate-y-0.5">
               <div className="flex items-center justify-between">
                 <h3 className="font-display text-lg font-semibold">{t.title}</h3>
                 <Badge variant={t.kind.startsWith("Pro") ? "ember" : "muted"}>{t.kind.split(" · ")[0]}</Badge>

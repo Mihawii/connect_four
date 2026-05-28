@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 import { analyzeMatch, heuristicReview } from "@/lib/coach/analyze";
 import { COACH_SYSTEM_PROMPT, buildCoachUserPrompt, type Persona } from "@/lib/coach/prompt";
 
@@ -14,6 +14,15 @@ const bodySchema = z.object({
   persona: z.enum(["analyst", "hype", "drill", "zen"]).default("analyst"),
 });
 
+export async function GET() {
+  return NextResponse.json({
+    ok: true,
+    endpoint: "coach",
+    analysisEngine: "ready",
+    source: process.env.OPENAI_API_KEY ? "openai" : "heuristic",
+  });
+}
+
 export async function POST(req: Request) {
   let parsed;
   try {
@@ -23,7 +32,7 @@ export async function POST(req: Request) {
   }
 
   const analysis = analyzeMatch(parsed.mode, parsed.cols);
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY;
 
   if (!apiKey) {
     return NextResponse.json({
@@ -34,26 +43,25 @@ export async function POST(req: Request) {
   }
 
   try {
-    const client = new Anthropic({ apiKey });
-    const model = process.env.ANTHROPIC_COACH_MODEL ?? "claude-sonnet-4-6";
-    // Prompt-cache the (stable) system prompt — saves ~90% on repeated reviews.
-    const system = [
-      { type: "text", text: COACH_SYSTEM_PROMPT, cache_control: { type: "ephemeral" } },
-    ] as unknown as Anthropic.MessageCreateParams["system"];
-    const msg = await client.messages.create({
+    const openai = new OpenAI({ apiKey });
+    const model = process.env.OPENAI_COACH_MODEL ?? "gpt-4o-mini";
+    
+    const response = await openai.chat.completions.create({
       model,
-      max_tokens: 1024,
-      system,
+      response_format: { type: "json_object" },
       messages: [
-        { role: "user", content: buildCoachUserPrompt(analysis, parsed.forPlayer, parsed.persona as Persona) },
+        { role: "system", content: COACH_SYSTEM_PROMPT },
+        { role: "user", content: buildCoachUserPrompt(analysis, parsed.forPlayer, parsed.persona as Persona) }
       ],
+      max_tokens: 1024,
     });
-    const text = msg.content.find((b) => b.type === "text");
-    const raw = text && "text" in text ? text.text : "";
+
+    const raw = response.choices[0]?.message.content || "";
     const jsonStart = raw.indexOf("{");
     const jsonEnd = raw.lastIndexOf("}");
     const review = jsonStart >= 0 ? JSON.parse(raw.slice(jsonStart, jsonEnd + 1)) : heuristicReview(analysis, parsed.forPlayer);
-    return NextResponse.json({ source: "claude", review, stats: analysis.summaryStats });
+    
+    return NextResponse.json({ source: "openai", review, stats: analysis.summaryStats });
   } catch (err) {
     return NextResponse.json({
       source: "heuristic-fallback",

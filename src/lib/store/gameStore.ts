@@ -4,6 +4,7 @@ import { create } from "zustand";
 import { applyMove, createInitialState, FORMATS, makeClock, tickClock } from "../engine/rules";
 import { chooseBotMove } from "../engine/bot";
 import type { Difficulty, GameState, Mode, Player } from "../engine/types";
+import { pingApiHealth } from "../api/health";
 
 export type Opponent = "human" | { kind: "bot"; difficulty: Difficulty; plays: Player };
 
@@ -94,6 +95,7 @@ async function maybeTriggerBot() {
   if (game.status !== "playing") return;
   if (typeof opponent !== "object") return;
   if (opponent.plays !== game.currentPlayer) return;
+  pingApiHealth("bot-start");
   useGame.setState({ thinking: true });
   await new Promise((r) => setTimeout(r, 280));
   const col = chooseBotMove(game, opponent.difficulty);

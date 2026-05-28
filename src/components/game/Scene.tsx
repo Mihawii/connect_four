@@ -1,20 +1,15 @@
 "use client";
 
 import * as React from "react";
-import { OrbitControls, Sparkles } from "@react-three/drei";
-import { useThree } from "@react-three/fiber";
+import { OrbitControls, ContactShadows } from "@react-three/drei";
 import { Board3D } from "./Board3D";
 import { Disc3D } from "./Disc3D";
 import { ColumnPicker } from "./ColumnPicker";
 import { BurnParticles } from "./BurnParticles";
 import { useGame } from "@/lib/store/gameStore";
 import { legalMoves, nextOpenRow } from "@/lib/engine/rules";
-import { slotToWorld } from "./constants";
-import type { BurnEvent } from "@/lib/engine/types";
-
-interface BirthRegistry {
-  [key: string]: number;
-}
+import { slotToWorld, BOARD_HEIGHT, FRAME_PAD } from "./constants";
+import { COLS, type BurnEvent } from "@/lib/engine/types";
 
 export function Scene() {
   const game = useGame((s) => s.game);
@@ -24,75 +19,66 @@ export function Scene() {
   const setHoverCol = useGame((s) => s.setHoverCol);
   const thinking = useGame((s) => s.thinking);
 
-  const births = React.useRef<BirthRegistry>({});
-  const [activeBurns, setActiveBurns] = React.useState<Array<BurnEvent & { id: string; at: number }>>([]);
-  const lastTotalTurns = React.useRef(0);
-  const lastMoveTimestamp = React.useRef<number | null>(null);
-  const { clock: r3fClock } = useThree();
+  const [activeBurns, setActiveBurns] = React.useState<Array<BurnEvent & { id: string }>>([]);
+  const lastMoveCount = React.useRef(0);
 
   React.useEffect(() => {
-    if (game.moves.length < lastTotalTurns.current) {
-      births.current = {};
-      setActiveBurns([]);
-    }
-    if (game.moves.length !== lastTotalTurns.current) {
-      lastTotalTurns.current = game.moves.length;
-      const lastMove = game.moves[game.moves.length - 1];
-      if (lastMove) {
-        const key = `${lastMove.col},${lastMove.row}`;
-        births.current[key] = r3fClock.elapsedTime * 1000;
-        if (lastMove.burnedThisTurn.length > 0) {
-          setActiveBurns((prev) => [
-            ...prev,
-            ...lastMove.burnedThisTurn.map((b) => ({
-              ...b,
-              id: `${b.col}-${b.row}-${Date.now()}-${Math.random()}`,
-              at: Date.now(),
-            })),
-          ]);
-        }
-        lastMoveTimestamp.current = lastMove.timestamp;
+    if (game.moves.length < lastMoveCount.current) setActiveBurns([]);
+    if (game.moves.length > lastMoveCount.current) {
+      const last = game.moves[game.moves.length - 1];
+      if (last?.burnedThisTurn.length) {
+        setActiveBurns((prev) => [
+          ...prev,
+          ...last.burnedThisTurn.map((b) => ({ ...b, id: `${b.col}-${b.row}-${Date.now()}-${Math.random()}` })),
+        ]);
       }
     }
-  }, [game.moves, r3fClock]);
+    lastMoveCount.current = game.moves.length;
+  }, [game.moves]);
 
   const legal = legalMoves(game);
-  const nextRowByCol = React.useMemo(() => {
-    return Array.from({ length: 7 }, (_, c) => Math.max(0, nextOpenRow(game.cells, c)));
-  }, [game.cells]);
+  const nextRowByCol = React.useMemo(
+    () => Array.from({ length: COLS }, (_, c) => Math.max(0, nextOpenRow(game.cells, c))),
+    [game.cells],
+  );
 
   const interactivePlayer =
     typeof opponent === "object" && opponent.kind === "bot" ? (opponent.plays === 1 ? 2 : 1) : null;
-  const canInteract = game.status === "playing" && !thinking && (interactivePlayer === null || game.currentPlayer === interactivePlayer);
+  const canInteract =
+    game.status === "playing" && !thinking && (interactivePlayer === null || game.currentPlayer === interactivePlayer);
 
   return (
     <>
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[5, 6, 8]} intensity={1.2} castShadow shadow-mapSize={[1024, 1024]} />
-      <directionalLight position={[-4, -2, 4]} intensity={0.4} color="#FF7B3A" />
-      <pointLight position={[0, 0, 5]} intensity={0.8} color="#FFB47A" distance={20} />
-      <hemisphereLight args={["#fff0e0", "#1a0d05", 0.5]} />
+      <ambientLight intensity={0.65} />
+      <directionalLight position={[4, 7, 8]} intensity={1.7} castShadow shadow-mapSize={[2048, 2048]} shadow-bias={-0.0004} />
+      <directionalLight position={[-6, 2, 4]} intensity={0.32} color="#cfe0ff" />
+      <directionalLight position={[0, -2, -6]} intensity={0.45} color="#ffd9a8" />
+      <hemisphereLight args={["#fff3e6", "#16120e", 0.4]} />
 
       <Board3D />
-
-      <Sparkles count={30} scale={[10, 8, 4]} size={2} speed={0.3} color="#FF7B3A" opacity={0.4} />
+      <ContactShadows
+        position={[0, -(BOARD_HEIGHT / 2 + FRAME_PAD + 0.35), 0]}
+        opacity={0.5}
+        scale={18}
+        blur={2.8}
+        far={7}
+        resolution={1024}
+        color="#000000"
+      />
 
       {game.cells.flatMap((column, c) =>
         column.map((disc, r) => {
           if (!disc) return null;
-          const key = `${c},${r}`;
-          const bornAt = births.current[key] ?? r3fClock.elapsedTime * 1000 - 1000;
           const isLastPlaced = game.lastMove?.col === c && game.lastMove?.row === r;
           const isWinningCell = !!game.winningLine?.some((p) => p.col === c && p.row === r);
           return (
             <Disc3D
-              key={key}
+              key={`${c}-${r}`}
               player={disc.player}
               age={disc.age}
               position={slotToWorld(c, r)}
               isLastPlaced={isLastPlaced}
               isWinningCell={isWinningCell}
-              bornAt={bornAt}
             />
           );
         }),
@@ -123,7 +109,7 @@ export function Scene() {
         maxPolarAngle={Math.PI / 1.9}
         minAzimuthAngle={-Math.PI / 6}
         maxAzimuthAngle={Math.PI / 6}
-        minDistance={9}
+        minDistance={8}
         maxDistance={14}
         target={[0, 0, 0]}
         enableDamping

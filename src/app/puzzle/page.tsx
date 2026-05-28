@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { motion } from "motion/react";
-import { Sparkles, Share2, Check, Flame } from "lucide-react";
+import { Sparkles, Share2, Check } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MiniBoard } from "@/components/game/MiniBoard";
@@ -68,8 +68,7 @@ export default function PuzzlePage() {
         </Badge>
         <h1 className="font-display text-3xl font-bold">Find the winning drop</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          {puzzle.toMove === 1 ? "Ember (red)" : "Flare (yellow)"} to move. One column wins immediately. One puzzle a
-          day — come back tomorrow.
+          {puzzle.toMove === 1 ? "Ember" : "Flare"} to move
         </p>
         <Badge variant="muted" className="mt-2 capitalize">
           {puzzle.difficulty}
@@ -108,12 +107,6 @@ export default function PuzzlePage() {
         </div>
       </div>
 
-      <div className="mt-4 flex items-center gap-2 rounded-lg border border-[var(--ember)]/30 bg-[var(--ember)]/5 px-4 py-3 text-sm">
-        <Flame className="size-4 text-[var(--ember)]" />
-        <span className="text-muted-foreground">
-          Pro unlocks the full puzzle archive — every past day, plus custom positions.
-        </span>
-      </div>
     </div>
   );
 }

@@ -2,25 +2,21 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Users, ArrowRight, Flame } from "lucide-react";
+import { Users, ArrowRight, Flame } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Mode } from "@/lib/engine/types";
-
-function roomCode() {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  return Array.from({ length: 5 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
-}
+import { createRoomCode, normalizeRoomCode } from "@/lib/room/share";
 
 export default function RoomLanding() {
   const router = useRouter();
   const [mode, setMode] = React.useState<Mode>("blitzInferno");
   const [join, setJoin] = React.useState("");
 
-  const create = () => router.push(`/room/${roomCode()}?mode=${mode}`);
+  const create = () => router.push(`/room/${createRoomCode()}?mode=${mode}`);
   const joinRoom = () => {
-    const c = join.trim().toUpperCase();
+    const c = normalizeRoomCode(join);
     if (c) router.push(`/room/${c}`);
   };
 
@@ -31,7 +27,6 @@ export default function RoomLanding() {
           <Users className="size-6" />
         </div>
         <h1 className="font-display text-3xl font-bold">Play a friend</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Create a room, share the link or QR. No account needed.</p>
       </div>
 
       <Card className="space-y-4 p-6">

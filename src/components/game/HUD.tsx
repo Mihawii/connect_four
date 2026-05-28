@@ -1,23 +1,22 @@
 "use client";
 
 import * as React from "react";
-import { motion, AnimatePresence } from "motion/react";
-import { Flame, RotateCcw, Undo2, Bot, Users, Trophy, Sparkles } from "lucide-react";
+import { RotateCcw, Undo2, Bot, Users, Sparkles } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import { CLOCK_PRESETS, useGame } from "@/lib/store/gameStore";
-import { Clock } from "./Clock";
-import { PLAYER_LABEL } from "./constants";
-import type { Difficulty, Mode } from "@/lib/engine/types";
 import { searchBestMove } from "@/lib/engine/solver";
 import { useSettings } from "@/lib/store/settingsStore";
+import { pingApiHealth } from "@/lib/api/health";
+import { PLAYER_LABEL } from "./constants";
+import type { Difficulty, Mode } from "@/lib/engine/types";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
-const MODES: Array<{ value: Mode; label: string; tag: string }> = [
-  { value: "classic", label: "Classic", tag: "On-ramp" },
-  { value: "inferno", label: "Inferno", tag: "Decay" },
-  { value: "blitzInferno", label: "Inferno Blitz", tag: "Bullet" },
+const MODES: Array<{ value: Mode; label: string }> = [
+  { value: "classic", label: "Classic" },
+  { value: "inferno", label: "Inferno" },
+  { value: "blitzInferno", label: "Blitz" },
 ];
 
 const DIFFICULTIES: Array<{ value: Difficulty; label: string }> = [
@@ -26,6 +25,39 @@ const DIFFICULTIES: Array<{ value: Difficulty; label: string }> = [
   { value: "hard", label: "Bonfire" },
   { value: "perfect", label: "Inferno" },
 ];
+
+function Segmented<T extends string>({
+  options,
+  value,
+  onChange,
+}: {
+  options: Array<{ value: T; label: string; icon?: React.ReactNode }>;
+  value: T;
+  onChange: (v: T) => void;
+}) {
+  return (
+    <div className="inline-flex items-center overflow-hidden rounded-md border border-white/[0.12]">
+      {options.map((o, i) => (
+        <button
+          key={o.value}
+          onClick={() => onChange(o.value)}
+          className={cn(
+            "flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold transition-colors",
+            i > 0 && "border-l border-white/[0.12]",
+            value === o.value
+              ? "bg-white/[0.12] text-white"
+              : "text-white/40 hover:bg-white/[0.06] hover:text-white/70",
+          )}
+        >
+          {o.icon}
+          {o.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+const selectCls = "h-8 border border-white/[0.12] bg-transparent text-xs text-white/80";
 
 export function HUD() {
   const game = useGame((s) => s.game);
@@ -42,190 +74,84 @@ export function HUD() {
 
   const handleHint = () => {
     if (game.status !== "playing") return;
+    pingApiHealth("hint-request");
     const result = searchBestMove(game, 5);
-    if (result.col >= 0) {
-      toast.success(`Best column: ${result.col + 1}`, {
-        description: `${PLAYER_LABEL[game.currentPlayer]}'s best play according to a 5-deep search.`,
-      });
-    }
+    if (result.col >= 0) toast(`Best column: ${result.col + 1}`);
   };
 
-  const handleNewGame = (mode: Mode) => {
-    const clockPreset = mode === "blitzInferno" ? ("60+1" as const) : undefined;
-    newGame(mode, { opponent, clockPreset });
-  };
+  const handleMode = (mode: Mode) =>
+    newGame(mode, { opponent, clockPreset: mode === "blitzInferno" ? "60+1" : undefined });
 
   return (
-    <div className="grid grid-cols-1 gap-3 lg:grid-cols-[260px_1fr_260px]">
-      <aside className="space-y-3">
-        <div className="rounded-xl border border-border bg-card/80 p-3 backdrop-blur">
-          <p className="mb-2 text-[10px] uppercase tracking-widest text-muted-foreground">Mode</p>
-          <div className="flex flex-col gap-1.5">
-            {MODES.map((m) => (
-              <button
-                key={m.value}
-                onClick={() => handleNewGame(m.value)}
-                className={`group flex items-center justify-between rounded-md border px-3 py-2 text-left text-sm transition-all ${
-                  game.mode === m.value
-                    ? "border-[var(--ember)]/60 bg-[var(--ember)]/10 text-foreground"
-                    : "border-border/60 bg-background/40 text-muted-foreground hover:border-border hover:text-foreground"
-                }`}
-              >
-                <span className="flex items-center gap-2 font-medium">
-                  {m.value === "classic" ? null : <Flame className="size-3.5 text-[var(--ember)]" />}
-                  {m.label}
-                </span>
-                <span className="text-[10px] uppercase tracking-wider text-muted-foreground">{m.tag}</span>
-              </button>
-            ))}
-          </div>
-        </div>
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2.5 border-b border-white/[0.08] pb-3">
+      <Segmented options={MODES} value={game.mode} onChange={handleMode} />
 
-        <div className="rounded-xl border border-border bg-card/80 p-3 backdrop-blur">
-          <p className="mb-2 text-[10px] uppercase tracking-widest text-muted-foreground">Opponent</p>
-          <div className="grid grid-cols-2 gap-1.5">
-            <button
-              onClick={() => setOpponent("human")}
-              className={`flex items-center justify-center gap-1.5 rounded-md border px-2 py-2 text-xs transition-colors ${
-                opponentKind === "human"
-                  ? "border-[var(--ember)]/60 bg-[var(--ember)]/10 text-foreground"
-                  : "border-border/60 text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <Users className="size-3.5" /> Human
-            </button>
-            <button
-              onClick={() => setOpponent({ kind: "bot", difficulty: botDifficulty, plays: 2 })}
-              className={`flex items-center justify-center gap-1.5 rounded-md border px-2 py-2 text-xs transition-colors ${
-                opponentKind === "bot"
-                  ? "border-[var(--ember)]/60 bg-[var(--ember)]/10 text-foreground"
-                  : "border-border/60 text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <Bot className="size-3.5" /> Bot
-            </button>
-          </div>
-          {opponentKind === "bot" && (
-            <div className="mt-3 space-y-2">
-              <Select value={botDifficulty} onValueChange={(v) => setOpponent({ kind: "bot", difficulty: v as Difficulty, plays: botPlays })}>
-                <SelectTrigger className="h-8 text-xs">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {DIFFICULTIES.map((d) => (
-                    <SelectItem key={d.value} value={d.value}>
-                      {d.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <div className="flex items-center gap-1.5">
-                <span className="text-[10px] uppercase text-muted-foreground">Bot plays:</span>
-                <Button
-                  size="sm"
-                  variant={botPlays === 1 ? "ember" : "outline"}
-                  className="h-7 px-2 text-xs"
-                  onClick={() => setOpponent({ kind: "bot", difficulty: botDifficulty, plays: 1 })}
-                >
-                  Ember
-                </Button>
-                <Button
-                  size="sm"
-                  variant={botPlays === 2 ? "ember" : "outline"}
-                  className="h-7 px-2 text-xs"
-                  onClick={() => setOpponent({ kind: "bot", difficulty: botDifficulty, plays: 2 })}
-                >
-                  Flare
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
+      <Segmented
+        options={[
+          { value: "human", label: "Human", icon: <Users className="size-3.5" /> },
+          { value: "bot", label: "Bot", icon: <Bot className="size-3.5" /> },
+        ]}
+        value={opponentKind}
+        onChange={(v) => setOpponent(v === "human" ? "human" : { kind: "bot", difficulty: botDifficulty, plays: 2 })}
+      />
 
-        <div className="rounded-xl border border-border bg-card/80 p-3 backdrop-blur">
-          <p className="mb-2 text-[10px] uppercase tracking-widest text-muted-foreground">Time control</p>
-          <Select
-            value={game.clock ? "60+1" : "untimed"}
-            onValueChange={(v) => {
-              if (v === "untimed") newGame(game.mode === "blitzInferno" ? "inferno" : game.mode);
-              else newGame("blitzInferno", { clockPreset: v as keyof typeof CLOCK_PRESETS });
-            }}
-          >
-            <SelectTrigger className="h-8 text-xs">
+      {opponentKind === "bot" && (
+        <>
+          <Select value={botDifficulty} onValueChange={(v) => setOpponent({ kind: "bot", difficulty: v as Difficulty, plays: botPlays })}>
+            <SelectTrigger className={cn(selectCls, "w-28")}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="untimed">Untimed</SelectItem>
-              {Object.entries(CLOCK_PRESETS).map(([k, v]) => (
-                <SelectItem key={k} value={k}>
-                  {v.label}
+              {DIFFICULTIES.map((d) => (
+                <SelectItem key={d.value} value={d.value}>
+                  {d.label}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-        </div>
-      </aside>
+          <button
+            onClick={() => setOpponent({ kind: "bot", difficulty: botDifficulty, plays: botPlays === 1 ? 2 : 1 })}
+            className="flex items-center gap-1.5 rounded-md border border-white/[0.12] px-3 py-1.5 text-xs font-medium text-white/80 transition-colors hover:bg-white/[0.06]"
+          >
+            <span className={cn("size-3 rounded-full", botPlays === 1 ? "bg-[var(--ember)]" : "bg-[var(--gold)]")} />
+            {PLAYER_LABEL[botPlays]}
+          </button>
+        </>
+      )}
 
-      <div className="flex flex-col items-center justify-between gap-3">
-        <div className="flex items-center justify-between gap-3 self-stretch">
-          <Clock player={1} />
-          <div className="hidden flex-col items-center gap-1 text-xs text-muted-foreground sm:flex">
-            <span className="font-mono">Turn {game.totalTurns + 1}</span>
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={game.currentPlayer + game.status}
-                initial={{ opacity: 0, y: -6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 6 }}
-              >
-                <Badge variant={game.currentPlayer === 1 ? "ember" : "secondary"}>
-                  {game.status === "playing"
-                    ? `${PLAYER_LABEL[game.currentPlayer]} to drop`
-                    : game.status === "won"
-                      ? `${PLAYER_LABEL[game.winner ?? 1]} wins`
-                      : game.status === "timeout"
-                        ? `${PLAYER_LABEL[game.winner ?? 1]} wins on time`
-                        : game.status === "draw"
-                          ? "Draw"
-                          : "Match over"}
-                </Badge>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-          <Clock player={2} />
-        </div>
+      <Select
+        value={game.clock ? "60+1" : "untimed"}
+        onValueChange={(v) =>
+          v === "untimed"
+            ? newGame(game.mode === "blitzInferno" ? "inferno" : game.mode, { opponent })
+            : newGame("blitzInferno", { opponent, clockPreset: v as keyof typeof CLOCK_PRESETS })}
+      >
+        <SelectTrigger className={cn(selectCls, "w-32")}>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="untimed">Untimed</SelectItem>
+          {Object.entries(CLOCK_PRESETS).map(([k, v]) => (
+            <SelectItem key={k} value={k}>
+              {v.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <div className="ml-auto flex items-center gap-1">
+        {showHints && (
+          <Button variant="ghost" size="icon" onClick={handleHint} disabled={game.status !== "playing"} title="Hint" className="text-white/40 hover:bg-white/[0.08] hover:text-white/70">
+            <Sparkles className="text-[var(--ember)]" />
+          </Button>
+        )}
+        <Button variant="ghost" size="icon" onClick={undo} disabled={game.moves.length === 0} title="Undo" className="text-white/40 hover:bg-white/[0.08] hover:text-white/70">
+          <Undo2 />
+        </Button>
+        <Button variant="ghost" size="icon" onClick={reset} title="Restart" className="text-white/40 hover:bg-white/[0.08] hover:text-white/70">
+          <RotateCcw />
+        </Button>
       </div>
-
-      <aside className="space-y-3">
-        <div className="rounded-xl border border-border bg-card/80 p-3 backdrop-blur">
-          <p className="mb-2 text-[10px] uppercase tracking-widest text-muted-foreground">Match</p>
-          <div className="flex flex-col gap-2">
-            <Button variant="outline" size="sm" onClick={undo} disabled={game.moves.length === 0}>
-              <Undo2 className="size-3.5" /> Undo
-            </Button>
-            <Button variant="outline" size="sm" onClick={reset}>
-              <RotateCcw className="size-3.5" /> Restart
-            </Button>
-            {showHints && (
-              <Button variant="ghost" size="sm" onClick={handleHint} disabled={game.status !== "playing"}>
-                <Sparkles className="size-3.5 text-[var(--ember)]" /> Hint
-              </Button>
-            )}
-          </div>
-        </div>
-        <div className="rounded-xl border border-border bg-card/80 p-3 backdrop-blur">
-          <p className="mb-2 text-[10px] uppercase tracking-widest text-muted-foreground">Live stats</p>
-          <dl className="space-y-1.5 text-xs">
-            <div className="flex justify-between"><dt className="text-muted-foreground">Moves</dt><dd className="font-mono">{game.totalTurns}</dd></div>
-            <div className="flex justify-between"><dt className="text-muted-foreground">Burns total</dt><dd className="font-mono">{game.moves.reduce((a, m) => a + m.burnedThisTurn.length, 0)}</dd></div>
-            <div className="flex justify-between"><dt className="text-muted-foreground">Active discs</dt><dd className="font-mono">{game.cells.flat().filter(Boolean).length}</dd></div>
-          </dl>
-        </div>
-        <div className="rounded-xl border border-[var(--ember)]/30 bg-[var(--ember)]/5 p-3 backdrop-blur">
-          <p className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-[var(--ember)]"><Trophy className="size-3" /> Rule</p>
-          <p className="mt-1 text-xs text-foreground">Every disc lasts <span className="font-mono text-[var(--ember)]">10 of your turns</span>. Then it burns.</p>
-        </div>
-      </aside>
     </div>
   );
 }

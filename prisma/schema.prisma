@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                     String   @id @default(uuid())
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  hasCompletedOnboarding Boolean  @default(false)
+}
+
+model Match {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  mode      String
+  winner    Int?
+  turns     Int
+}
+
+model Room {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  mode      String
+  state     Json
+  peers     Json
+}
