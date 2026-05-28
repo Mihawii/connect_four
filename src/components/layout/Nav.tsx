@@ -1,36 +1,23 @@
 "use client";
 
-import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Flame, Trophy, Sparkles, ShoppingBag, GraduationCap, Globe } from "@/components/icons";
 import { Button } from "@/components/ui/button";
+import { useI18n } from "@/components/i18n/LanguageProvider";
 import { cn } from "@/lib/utils";
 
 const links = [
-  { href: "/play", label: "Play", icon: Flame },
-  { href: "/puzzle", label: "Daily", icon: Sparkles },
-  { href: "/leaderboard", label: "Ladder", icon: Trophy },
-  { href: "/store", label: "Store", icon: ShoppingBag },
-  { href: "/learn", label: "Learn", icon: GraduationCap },
+  { href: "/play", labelKey: "nav.play", icon: Flame },
+  { href: "/puzzle", labelKey: "nav.daily", icon: Sparkles },
+  { href: "/leaderboard", labelKey: "nav.ladder", icon: Trophy },
+  { href: "/store", labelKey: "nav.store", icon: ShoppingBag },
+  { href: "/learn", labelKey: "nav.learn", icon: GraduationCap },
 ];
 
 export function Nav() {
   const pathname = usePathname();
-  const [language, setLanguage] = React.useState<"EN" | "RU" | "KZ">("EN");
-
-  React.useEffect(() => {
-    const saved = window.localStorage.getItem("inferno_language");
-    if (saved === "EN" || saved === "RU" || saved === "KZ") {
-      setLanguage(saved);
-    }
-  }, []);
-
-  const cycleLanguage = () => {
-    const next = language === "EN" ? "RU" : language === "RU" ? "KZ" : "EN";
-    setLanguage(next);
-    window.localStorage.setItem("inferno_language", next);
-  };
+  const { language, cycleLanguage, t } = useI18n();
 
   if (pathname === "/") return null;
 
@@ -55,7 +42,7 @@ export function Nav() {
                   active ? "text-foreground" : "text-muted-foreground hover:text-foreground",
                 )}
               >
-                {l.label}
+                {t(l.labelKey)}
                 {active && <span className="absolute -bottom-[5px] left-0 h-[2px] w-full bg-[var(--ember)]" />}
               </Link>
             );
@@ -67,15 +54,15 @@ export function Nav() {
             type="button"
             onClick={cycleLanguage}
             className="inline-flex h-9 items-center gap-1.5 rounded-md px-3 font-display text-xs font-semibold text-muted-foreground transition-colors hover:bg-[var(--board-bg-elevated)] hover:text-foreground"
-            aria-label="Change language"
-            title="Change language"
+            aria-label={t("nav.changeLanguage")}
+            title={t("nav.changeLanguage")}
           >
             <Globe className="size-4" />
             {language}
           </button>
           {pathname !== "/play" && (
             <Button asChild variant="ember" size="sm" className="inline-flex">
-              <Link href="/play">Play now</Link>
+              <Link href="/play">{t("nav.playNow")}</Link>
             </Button>
           )}
         </div>
@@ -96,7 +83,7 @@ export function Nav() {
               )}
             >
               <Icon className={cn("size-5", active && "text-[var(--ember)]")} />
-              {l.label}
+              {t(l.labelKey)}
             </Link>
           );
         })}

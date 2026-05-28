@@ -4,6 +4,7 @@ import * as React from "react";
 import { RotateCcw, Undo2, Bot, Users, Sparkles } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useI18n } from "@/components/i18n/LanguageProvider";
 import { CLOCK_PRESETS, useGame } from "@/lib/store/gameStore";
 import { searchBestMove } from "@/lib/engine/solver";
 import { useSettings } from "@/lib/store/settingsStore";
@@ -12,19 +13,6 @@ import { PLAYER_LABEL } from "./constants";
 import type { Difficulty, Mode } from "@/lib/engine/types";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-
-const MODES: Array<{ value: Mode; label: string }> = [
-  { value: "classic", label: "Classic" },
-  { value: "inferno", label: "Inferno" },
-  { value: "blitzInferno", label: "Blitz" },
-];
-
-const DIFFICULTIES: Array<{ value: Difficulty; label: string }> = [
-  { value: "random", label: "Sparkler" },
-  { value: "easy", label: "Kindling" },
-  { value: "hard", label: "Bonfire" },
-  { value: "perfect", label: "Inferno" },
-];
 
 function Segmented<T extends string>({
   options,
@@ -60,6 +48,7 @@ function Segmented<T extends string>({
 const selectCls = "h-8 border-0 bg-transparent px-2 font-display text-xs text-foreground shadow-none";
 
 export function HUD() {
+  const { t } = useI18n();
   const game = useGame((s) => s.game);
   const opponent = useGame((s) => s.opponent);
   const newGame = useGame((s) => s.newGame);
@@ -71,6 +60,25 @@ export function HUD() {
   const opponentKind = opponent === "human" ? "human" : "bot";
   const botDifficulty = typeof opponent === "object" ? opponent.difficulty : "easy";
   const botPlays = typeof opponent === "object" ? opponent.plays : 2;
+
+  const modes: Array<{ value: Mode; label: string }> = React.useMemo(
+    () => [
+      { value: "classic", label: t("hud.modeClassic") },
+      { value: "inferno", label: t("hud.modeInferno") },
+      { value: "blitzInferno", label: t("hud.modeBlitz") },
+    ],
+    [t],
+  );
+
+  const difficulties: Array<{ value: Difficulty; label: string }> = React.useMemo(
+    () => [
+      { value: "random", label: t("hud.difficultySparkler") },
+      { value: "easy", label: t("hud.difficultyKindling") },
+      { value: "hard", label: t("hud.difficultyBonfire") },
+      { value: "perfect", label: t("hud.difficultyInferno") },
+    ],
+    [t],
+  );
 
   const handleHint = () => {
     if (game.status !== "playing") return;
@@ -84,12 +92,12 @@ export function HUD() {
 
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-2.5 pb-3">
-      <Segmented options={MODES} value={game.mode} onChange={handleMode} />
+      <Segmented options={modes} value={game.mode} onChange={handleMode} />
 
       <Segmented
         options={[
-          { value: "human", label: "Human", icon: <Users className="size-3.5" /> },
-          { value: "bot", label: "Bot", icon: <Bot className="size-3.5" /> },
+          { value: "human", label: t("hud.opponentHuman"), icon: <Users className="size-3.5" /> },
+          { value: "bot", label: t("hud.opponentBot"), icon: <Bot className="size-3.5" /> },
         ]}
         value={opponentKind}
         onChange={(v) => setOpponent(v === "human" ? "human" : { kind: "bot", difficulty: botDifficulty, plays: 2 })}
@@ -102,7 +110,7 @@ export function HUD() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {DIFFICULTIES.map((d) => (
+              {difficulties.map((d) => (
                 <SelectItem key={d.value} value={d.value}>
                   {d.label}
                 </SelectItem>
@@ -130,7 +138,7 @@ export function HUD() {
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="untimed">Untimed</SelectItem>
+          <SelectItem value="untimed">{t("hud.untimed")}</SelectItem>
           {Object.entries(CLOCK_PRESETS).map(([k, v]) => (
             <SelectItem key={k} value={k}>
               {v.label}
@@ -141,7 +149,7 @@ export function HUD() {
 
       <div className="ml-auto flex items-center gap-1">
         {showHints && (
-          <Button variant="ghost" size="icon" onClick={handleHint} disabled={game.status !== "playing"} title="Hint" className="text-muted-foreground">
+          <Button variant="ghost" size="icon" onClick={handleHint} disabled={game.status !== "playing"} title={t("hud.hint")} className="text-muted-foreground">
             <Sparkles className="text-[var(--ember)]" />
           </Button>
         )}

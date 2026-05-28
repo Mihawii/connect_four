@@ -13,17 +13,12 @@ import {
   Trophy,
 } from "iconoir-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { useI18n } from "@/components/i18n/LanguageProvider";
 import { demoLeaderboard, type LeaderRow } from "@/lib/leaderboardDemo";
 import { LEADERBOARD_FORMATS } from "@/lib/leaderboard";
 import { cn } from "@/lib/utils";
 
 const FORMATS = LEADERBOARD_FORMATS;
-
-const SCOPES = [
-  { label: "Global", icon: Globe, active: true },
-  { label: "Almaty", icon: Pin, active: false },
-  { label: "Friends", icon: PeopleTag, active: false },
-];
 
 const TOURNAMENTS = [
   { title: "Weekly Blitz Open", kind: "Free", seats: "32 players", prize: "Cosmetic ribbon for top 3", when: "Sun 18:00" },
@@ -52,8 +47,18 @@ function RankMark({ rank }: { rank: number }) {
 }
 
 export default function LeaderboardPage() {
+  const { t } = useI18n();
   const [format, setFormat] = React.useState("blitzInferno");
   const [rows, setRows] = React.useState<LeaderRow[]>(() => demoLeaderboard(1));
+
+  const scopes = React.useMemo(
+    () => [
+      { label: t("leaderboard.global"), icon: Globe, active: true },
+      { label: t("leaderboard.almaty"), icon: Pin, active: false },
+      { label: t("leaderboard.friends"), icon: PeopleTag, active: false },
+    ],
+    [t],
+  );
 
   React.useEffect(() => {
     let active = true;
@@ -88,16 +93,16 @@ export default function LeaderboardPage() {
             <Trophy className="size-8" strokeWidth={2.2} />
           </div>
           <div>
-            <h1 className="font-display text-5xl font-semibold leading-tight md:text-6xl">The Ladder</h1>
+            <h1 className="font-display text-5xl font-semibold leading-tight md:text-6xl">{t("leaderboard.title")}</h1>
           </div>
         </div>
 
         <aside className="rounded-lg border-[1.5px] border-ink bg-[var(--paper-2)] p-4">
-          <p className="font-display text-sm font-semibold text-muted-foreground">Current mark</p>
+          <p className="font-display text-sm font-semibold text-muted-foreground">{t("leaderboard.currentMark")}</p>
           <div className="mt-2 flex items-end justify-between gap-3">
             <div>
               <p className="font-display text-4xl font-semibold leading-none">{leader?.rating ?? "—"}</p>
-              <p className="mt-1 text-sm text-muted-foreground">{leader ? `${leader.name}, ${leader.city}` : "No leader yet"}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{leader ? `${leader.name}, ${leader.city}` : t("leaderboard.noLeaderYet")}</p>
             </div>
             <Bonfire className="size-8 text-[var(--ember)]" strokeWidth={2.2} />
           </div>
@@ -116,7 +121,7 @@ export default function LeaderboardPage() {
             </TabsList>
 
             <div className="flex rounded-lg border border-border bg-[var(--paper-2)] p-1">
-              {SCOPES.map((scope) => {
+              {scopes.map((scope) => {
                 const Icon = scope.icon;
                 return (
                   <button
@@ -139,16 +144,16 @@ export default function LeaderboardPage() {
             <TabsContent key={f.value} value={f.value} className="mt-4">
               <div className="overflow-hidden rounded-lg border-[1.5px] border-ink bg-[var(--paper-2)]">
                 <div className="hidden grid-cols-[4rem_minmax(0,1fr)_7rem_6rem_6rem] items-center border-b-[1.5px] border-ink bg-[var(--paper)] px-4 py-2 font-display text-xs font-semibold text-muted-foreground sm:grid">
-                  <span>Rank</span>
-                  <span>Player</span>
-                  <span>Tier</span>
-                  <span>Games</span>
-                  <span className="text-right">Rating</span>
+                  <span>{t("leaderboard.rank")}</span>
+                  <span>{t("leaderboard.player")}</span>
+                  <span>{t("leaderboard.tier")}</span>
+                  <span>{t("leaderboard.games")}</span>
+                  <span className="text-right">{t("leaderboard.rating")}</span>
                 </div>
 
                 {rows.map((r) => (
                   <div
-                    key={r.name}
+                    key={`${r.name}-${r.rank}`}
                     className={cn(
                       "grid grid-cols-[3rem_minmax(0,1fr)_4.5rem] items-center gap-3 border-b border-border/80 px-4 py-3 last:border-0 sm:grid-cols-[4rem_minmax(0,1fr)_7rem_6rem_6rem]",
                       r.rank <= 3 && "bg-[var(--gold)]/14",
@@ -180,7 +185,7 @@ export default function LeaderboardPage() {
           <div className="rounded-lg border-[1.5px] border-ink bg-[var(--paper-2)] p-4">
             <p className="flex items-center gap-2 font-display text-sm font-semibold">
               <Tournament className="size-4 text-[var(--ember)]" strokeWidth={2.2} />
-              Weekly tables
+              {t("leaderboard.weeklyTables")}
             </p>
             <div className="mt-3 space-y-3">
               {TOURNAMENTS.map((event) => (
@@ -203,9 +208,9 @@ export default function LeaderboardPage() {
           </div>
 
           <div className="rounded-lg border border-border bg-[var(--paper-2)] p-4">
-            <p className="font-display text-sm font-semibold">How rating moves</p>
+            <p className="font-display text-sm font-semibold">{t("leaderboard.howRatingMoves")}</p>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Beat stronger players to climb faster. Inferno Blitz is weighted separately from Classic.
+              {t("leaderboard.ratingRule")}
             </p>
           </div>
         </aside>
